@@ -29,7 +29,7 @@ type PostTemplateData struct {
 	Date      string
 	Tags      []string
 	Catalogue string
-	Content   string
+	Content   template.HTML
 }
 
 func NewPost(sourcePath string, destination string, m *Meta, t *template.Template) *Post {
@@ -71,13 +71,13 @@ func (p *Post) Generate() (err error) {
 		Date:      p.Meta.Date,
 		Tags:      p.Meta.Tags,
 		Catalogue: p.Meta.Catalogue,
-		Content:   string(p.htmlData),
+		Content:   template.HTML(string(p.htmlData)),
 	}
 	if err := p.Template.Execute(writer, td); err != nil {
 		return fmt.Errorf("Executing template Error: %v", err)
 	}
 	if err := writer.Flush(); err != nil {
-		return fmt.Errorf("Writing file Err: %v", filePath, err)
+		return fmt.Errorf("Writing file Err: %v", err)
 	}
 	return nil
 }
