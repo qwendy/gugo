@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/go-yaml/yaml"
 	"github.com/henrylee2cn/pholcus/common/goquery"
 	"github.com/russross/blackfriday"
 	"github.com/sourcegraph/syntaxhighlight"
@@ -32,11 +33,10 @@ type PostTemplateData struct {
 	Content   template.HTML
 }
 
-func NewPost(sourcePath string, destination string, m *Meta, t *template.Template) *Post {
+func NewPost(sourcePath string, destination string, t *template.Template) *Post {
 	return &Post{
 		SourcePath:  sourcePath,
 		Destination: destination,
-		Meta:        m,
 		Template:    t,
 	}
 }
@@ -46,6 +46,36 @@ func (p *Post) Fetch() error {
 	input, err := ioutil.ReadFile(p.SourcePath)
 	p.sourceData = input
 	return err
+}
+
+// parse the metedata from markdown file and remove it from sourcefile
+func (p *Post) ParseMetaData() (err error) {
+	buf := bufio.NewReader(bytes.NewReader(p.sourceData))
+	metaData := []byte{}
+	ok := false
+	// get the data between the line only have "---"
+	for true {
+		line, _, lineErr := buf.ReadLine()
+		if lineErr != nil {
+			break
+		}
+		if string(line) == "---" {
+			ok = !ok
+			if ok == false {
+				break
+			}
+		}
+		if ok {
+			line = append(line, []byte("\r\n")...)
+			metaData = append(metaData, line...)
+		}
+	}
+	err = yaml.Unmarshal(metaData, p.Meta)
+	if err != nil {
+		return
+	}
+	_, err = buf.Read(p.sourceData)
+	return
 }
 
 // convert mardown file data to html

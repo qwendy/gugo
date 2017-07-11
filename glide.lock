@@ -1,6 +1,25 @@
-hash: a61cd7158e2ce4e5c080151b131d32d85a0572728bf2c8edb37f908a4ffb8eca
-updated: 2017-07-10T10:08:10.7779319+08:00
+hash: 135d18b2c6ab2b69b246735997f7f920b6373ce94766db15927a2c2b19857810
+updated: 2017-07-11T10:52:44.8786149+08:00
 imports:
+- name: github.com/andybalholm/cascadia
+  version: 349dd0209470eabd9514242c688c403c0926d266
+- name: github.com/go-yaml/yaml
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+- name: github.com/henrylee2cn/pholcus
+  version: b49a56ac11c4d2f844c75ab974cb503e55d29c50
+  subpackages:
+  - common/goquery
 - name: github.com/PuerkitoBio/goquery
   version: e1271ee34c6a305e38566ecd27ae374944907ee9
+- name: github.com/russross/blackfriday
+  version: 0b647d0506a698cca42caca173e55559b12a69f2
+- name: github.com/sourcegraph/annotate
+  version: f4cad6c6324d3f584e1743d8b3e0e017a5f3a636
+- name: github.com/sourcegraph/syntaxhighlight
+  version: bd320f5d308e1a3c4314c678d8227a0d72574ae7
+- name: golang.org/x/net
+  version: 054b33e6527139ad5b1ec2f6232c3b175bd9a30c
+  subpackages:
+  - html
+  - html/atom
 testImports: []

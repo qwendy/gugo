@@ -3,7 +3,6 @@ package generator
 import (
 	"html/template"
 	"testing"
-	"time"
 )
 
 func TestNewPost(t *testing.T) {
@@ -11,7 +10,6 @@ func TestNewPost(t *testing.T) {
 	type args struct {
 		sourcePath  string
 		destination string
-		m           *Meta
 		t           *template.Template
 	}
 	tests := []struct {
@@ -25,10 +23,7 @@ func TestNewPost(t *testing.T) {
 			args: args{
 				sourcePath:  "../source/_post/test.md",
 				destination: "../public/test.html",
-				m: &Meta{
-					Title: "清风江上游",
-					Date:  time.Now().Format("2006-01-02 15:04:05"),
-				},
+
 				t: tpl,
 			},
 		},
@@ -39,12 +34,17 @@ func TestNewPost(t *testing.T) {
 			if err := post.Fetch(); err != nil {
 				t.Error(err)
 			}
+			if err := post.ParseMetaData(); err != nil {
+				t.Error(err)
+			}
 			if err := post.Convert(); err != nil {
 				t.Error(err)
 			}
+
 			if err := post.Generate(); err != nil {
 				t.Error(err)
 			}
+			t.Errorf("Meta:%+v", post.Meta)
 		})
 	}
 }
