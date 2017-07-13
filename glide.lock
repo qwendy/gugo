@@ -1,0 +1,37 @@
+hash: b8c34069f0e76d500c712207c5de357acc65cf97a11bb10f8ca6e1ccc1a9da8c
+updated: 2017-07-13T21:14:39.080518489+08:00
+imports:
+- name: github.com/andybalholm/cascadia
+  version: 349dd0209470eabd9514242c688c403c0926d266
+- name: github.com/go-yaml/yaml
+  version: 1be3d31502d6eabc0dd7ce5b0daab022e14a5538
+- name: github.com/henrylee2cn/pholcus
+  version: b49a56ac11c4d2f844c75ab974cb503e55d29c50
+  subpackages:
+  - common/goquery
+- name: github.com/mattn/go-colorable
+  version: 3fa8c76f9daed4067e4a806fb7e4dc86455c6d6a
+- name: github.com/mattn/go-isatty
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+- name: github.com/mgutz/ansi
+  version: 9520e82c474b0a04dd04f8a40959027271bab992
+- name: github.com/russross/blackfriday
+  version: 067529f716f4c3f5e37c8c95ddd59df1007290ae
+- name: github.com/sirupsen/logrus
+  version: 51dc0fc64317a2861273909081f9c315786533eb
+- name: github.com/sourcegraph/annotate
+  version: f4cad6c6324d3f584e1743d8b3e0e017a5f3a636
+- name: github.com/sourcegraph/syntaxhighlight
+  version: bd320f5d308e1a3c4314c678d8227a0d72574ae7
+- name: github.com/x-cray/logrus-prefixed-formatter
+  version: 0b2c791a02f18788b281dc30e243a0632dad695b
+- name: golang.org/x/net
+  version: f01ecb60fe3835d80d9a0b7b2bf24b228c89260e
+  subpackages:
+  - html
+  - html/atom
+- name: golang.org/x/sys
+  version: abf9c25f54453410d0c6668e519582a9e1115027
+  subpackages:
+  - unix
+testImports: []

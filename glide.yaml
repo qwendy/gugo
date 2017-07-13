@@ -1,22 +1,10 @@
 package: gugo
 import:
-- package: github.com/PuerkitoBio/goquery
-  version: ^1.1.0
 - package: github.com/go-yaml/yaml
-  repo: git@github.com:go-yaml/yaml.git
-  version: 1be3d31502d6eabc0dd7ce5b0daab022e14a5538
-  vcs: git
+- package: github.com/henrylee2cn/pholcus
+  subpackages:
+  - common/goquery
 - package: github.com/russross/blackfriday
-  repo: git@github.com:russross/blackfriday.git 
-  version: ^1.4.0
-  vcs: git
 - package: github.com/sirupsen/logrus
-  repo: git@github.com:sirupsen/logrus.git
-  version: 1fe8319fcaef78ef9220c9b05178df0f871dbc5d
-  vcs: git
 - package: github.com/sourcegraph/syntaxhighlight
-  version: bd320f5d308e1a3c4314c678d8227a0d72574ae7
-  vcs: git
 - package: github.com/x-cray/logrus-prefixed-formatter
-  version: 0b2c791a02f18788b281dc30e243a0632dad695b
-  vcs: git
