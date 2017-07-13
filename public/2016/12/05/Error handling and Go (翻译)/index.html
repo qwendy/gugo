@@ -1,0 +1,267 @@
+<html>
+
+<head>
+    <title>Error handling and Go (翻译)</title>
+</head>
+
+<body>
+    <div>Error handling and Go (翻译)</div>
+    <div>2016-12-05 19:32:38</div>
+    <div><p>本篇文章来自《The Go Blog》。文章地址为<a href="https://blog.golang.org/error-handling-and-go">https://blog.golang.org/error-handling-and-go</a>
+下面是在下的翻译。因为看英文看完就忘，所以翻译翻译，聊以自慰。</p>
+
+<h2>错误处理和Go</h2>
+
+<p>2011年7月12日</p>
+
+<h3>引言</h3>
+
+<p>如果你写过Go的代码，你可能已经遇到了内置的error类型。Go的代码使用error表示异常状态。例如os.Open函数打开文件失败的时候，返回一个不为nil的error值。</p>
+
+<pre><span class="kwd">func</span> <span class="typ">Open</span><span class="pun">(</span><span class="pln">name</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">(</span><span class="pln">file</span> <span class="pun">*</span><span class="typ">File</span><span class="pun">,</span> <span class="pln">err</span> <span class="pln">error</span><span class="pun">)</span>
+</pre>
+
+<p>下面的代码使用os.Open打开一个文件。如果出现一个error,它会调用log.Fatal来打印出错误结束。</p>
+
+<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="str">&#34;filename.ext&#34;</span><span class="pun">)</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+<span class="com">// do something with the open *File f</span>
+</pre>
+
+<p>在Go中，你仅需要知道这些关于error类型的知识，就能做很多事情了，但是在这篇文章中我们将仔细研究error，并讨论在Go中的一些好的错误处理的实例
+<!-- more --></p>
+
+<h3>error 类型</h3>
+
+<p>error类型是一个接口(interface)类型。一个error变量代表任意一个能将自己描绘成字符串的值。
+这个是接口的定义</p>
+
+<pre><span class="kwd">type</span> <span class="pln">error</span> <span class="kwd">interface</span> <span class="pun">{</span>
+    <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span>
+<span class="pun">}</span>
+</pre>
+
+<p>error类型如同其他所有内置类型是在universe block(<a href="https://golang.org/ref/spec#Blocks">The universe block encompasses all Go source text.</a>)中预声明（<a href="https://golang.org/ref/spec#Predeclared_identifiers">predeclare</a>）的。
+最常使用的error实例是error包中未导出（export）的errorString类型。</p>
+
+<pre><span class="com">// errorString is a trivial implementation of error.</span>
+<span class="kwd">type</span> <span class="pln">errorString</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="pln">s</span> <span class="pln">string</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="pln">errorString</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">s</span>
+<span class="pun">}</span>
+</pre>
+
+<p>你可以使用errors.New函数来构建一个这样的值。它接受一个字符串，将之转成errors.errorString，并返回error值</p>
+
+<pre><span class="com">// New returns an error that formats as the given text.</span>
+<span class="kwd">func</span> <span class="typ">New</span><span class="pun">(</span><span class="pln">text</span> <span class="pln">string</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">errorString</span><span class="pun">{</span><span class="pln">text</span><span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这是你可能会使用的errors.New的情况：</p>
+
+<pre><span class="kwd">func</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pln">f</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="pun">(</span><span class="kwd">float64</span><span class="pun">,</span> <span class="pln">error</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">errors</span><span class="pun">.</span><span class="typ">New</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number&#34;</span><span class="pun">)</span>
+    <span class="pun">}</span>
+    <span class="com">// implementation</span>
+<span class="pun">}</span>
+</pre>
+
+<p>使用一个负数参数来调用Sqrt，会得到一个非nil的error值（具体的表示是一个errors.errorString值）。调用者能通过<code>error</code>类型的Error方法获取错误字符串(“math: square root of…“)，或者就直接输出它：</p>
+
+<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pun">-</span><span class="dec">1</span><span class="pun">)</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>fmt包通过调用它的Error()方法格式化error类型的值。
+这个是错误的实现总结上下文的方法。错误应该由os.Open格式化返回为”open /etc/passwd: permission denied,” ,而不仅仅是”permission denied.“由Sqrt返回的错误缺少了关于无效参数的信息。
+在fmt包中有个有用的函数Errorf,用于增加这个信息。它根据 <code>Printf</code>规则来格式化字符串，并返回一个由errors.New创建的error类型。</p>
+
+<pre><span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在许多情况下fmt.Errorf已经足够 ，但是既然error是一个interface，你可以使用任意的数据结构作为error，让调用者来检查错误的详细信息。
+举个例子，我们假想的调用也许想重新使用这个无效参数来调用Sqrt。我们能通过定义一个新的error的实现完成这个目标，而不是使用errors.errorString：</p>
+
+<pre><span class="kwd">type</span> <span class="typ">NegativeSqrtError</span> <span class="kwd">float64</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">f</span> <span class="typ">NegativeSqrtError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="kwd">float64</span><span class="pun">(</span><span class="pln">f</span><span class="pun">)</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>复杂的调用可以使用类型断言（<a href="https://golang.org/ref/spec#Type_assertions">type assertion</a>）来检查NegativeSqrtError并特别处理，当调用者将error传递给fmt.Println或者log.Fatal的时候，不会有任何行为上的变化。
+再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中�任何行为上的变化。
+再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中指定的SyntaxError类型。</p>
+
+<pre><span class="kwd">type</span> <span class="typ">SyntaxError</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="pln">msg</span>    <span class="pln">string</span> <span class="com">// description of error</span>
+    <span class="typ">Offset</span> <span class="kwd">int64</span>  <span class="com">// error occurred after reading Offset bytes</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="typ">SyntaxError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">msg</span> <span class="pun">}</span>
+</pre>
+
+<p>Offset字段甚至不会在error默认的格式化中出现，但是调用者可以使用它，添加文件和行信息到到error消息中。</p>
+
+<pre><span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dec</span><span class="pun">.</span><span class="typ">Decode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">val</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">serr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pun">*</span><span class="pln">json</span><span class="pun">.</span><span class="typ">SyntaxError</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">{</span>
+        <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">findLine</span><span class="pun">(</span><span class="pln">f</span><span class="pun">,</span> <span class="pln">serr</span><span class="pun">.</span><span class="typ">Offset</span><span class="pun">)</span>
+        <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%s:%d:%d: %v&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">.</span><span class="typ">Name</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="pln">err</span>
+<span class="pun">}</span>
+</pre>
+
+<p>（这是来自Camlistore项目的真实代码的省略的简化版本）
+error接口仅仅需要Error方法；特殊的error实现可能需要其他的方法。例如，net包中返回error类型的错误，遵循了通常的惯例，但是一些error的实现通过net.Error接口定义了其他方法：</p>
+
+<pre><span class="kwd">package</span> <span class="pln">net</span>
+
+<span class="kwd">type</span> <span class="typ">Error</span> <span class="kwd">interface</span> <span class="pun">{</span>
+    <span class="pln">error</span>
+    <span class="typ">Timeout</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span>   <span class="com">// Is the error a timeout?</span>
+    <span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span> <span class="com">// Is the error temporary?</span>
+<span class="pun">}</span>
+</pre>
+
+<p>客户端代码可以使用类型断言（type assertion）来测试，然后从永久性错误中区分短暂的的网络错误。例如，一个网络爬虫也许会休眠并重试当它遇到一个零时性错误并放弃其他的。</p>
+
+<pre><span class="kwd">if</span> <span class="pln">nerr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pln">net</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">&amp;</span><span class="pun">&amp;</span> <span class="pln">nerr</span><span class="pun">.</span><span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">time</span><span class="pun">.</span><span class="typ">Sleep</span><span class="pun">(</span><span class="dec">1e9</span><span class="pun">)</span>
+    <span class="kwd">continue</span>
+<span class="pun">}</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<h3>简化重复的错误处理</h3>
+
+<p>在Go中，错误处理非常重要。语言的设计和约定鼓励你在发生错误的时候明确检查错误（和其他语言使用抛出错误并获取错误（ throwing exceptions and sometimes catching them ）的惯例不一样）。在有些情况下，这使你的Go代码冗余，但是幸运的是，你可以使用一些技巧来最少的重复错误处理。
+思考一个使用HTTP处理器的App Engine应用，从数据库中检索一条记录并使用模板格式化。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">http</span><span class="pun">.</span><span class="typ">HandleFunc</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">viewRecord</span><span class="pun">)</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
+        <span class="kwd">return</span>
+    <span class="pun">}</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这个函数处理由datastore.Get函数和<code>viewTemplate</code>的Execute方法产生的错误。在这两个错误中，它用HTTP状态码500(“Internal Server Error”)来向用户展现一个简单的错误信息。这段代码看起来是可管理的，但是添加了多余的HTTP处理器，并以许多相同的错误处理代码结束。
+为了减少重复，我们可以定义我们自己的HTTP appHandler类型来包含error并返回值。</p>
+
+<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span>
+</pre>
+
+<p>然后，我们修改我们的viewRecord 函数来返回错误：</p>
+
+<pre><span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pln">err</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这和原始的版本相似，但是http包不能理解返回error的函数。为了修正，我们在appHandler上实现了http.Handler接口的ServeHTTP方法：</p>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>ServeHTTP方法调用appHandler函数并且向用户显示错误（如果有的话）。注意这个方法的接收者，fn，是一个函数。（Go可以这样做！）方法调用函数通过调用表达式fn(w, r)中的接收者。
+现在，当使用http包注册viewRecord的时候，我们使用Handle函数（而不是HandleFunc）appHandler作为http.Handler（而不是http.HandlerFunc）</p>
+
+<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">http</span><span class="pun">.</span><span class="typ">Handle</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">appHandler</span><span class="pun">(</span><span class="pln">viewRecord</span><span class="pun">)</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>通过基本架构中的错误处理，我们可以使它更加的用户友好。相比仅仅展示错误的字符串，更好的方法是给用户简单的错误消息并附加适合的HTTP状态码，同时在App Engine开发者控制台记录完整的错误用于调试。
+为了做到这点，我们创建一个appError 结构体，包含一个error类型和一些其他字段</p>
+
+<pre><span class="kwd">type</span> <span class="pln">appError</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="typ">Error</span>   <span class="pln">error</span>
+    <span class="typ">Message</span> <span class="pln">string</span>
+    <span class="typ">Code</span>    <span class="kwd">int</span>
+<span class="pun">}</span>
+</pre>
+
+<p>接下来，我们修改appHandler类型以便返回*appError值：</p>
+
+<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span>
+</pre>
+
+<p>（通常，不使用error，而是使用具体的error类型进行传递的做法是错误的，原因会在<a href="https://golang.org/doc/faq#nil_error">Go FAQ</a>中讨论，不过在这里是正确的，因为ServeHTTP是唯一看到这个值并且使用其内容的地方。）
+ 为了使<code>appHandler</code>的ServeHTTP方法向用户显示<code>appError</code>的消息和正确的HTTP状态码，并向开发者记录完整的Error：</p>
+
+<pre> <span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">e</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">e</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span> <span class="com">// e is *appError, not os.Error.</span>
+        <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+        <span class="pln">c</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%v&#34;</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Message</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Code</span><span class="pun">)</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>最后，我们更新viewRecord函数，并使它遇到错误的时候返回更多的上下文：</p>
+
+<pre> <span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Record not found&#34;</span><span class="pun">,</span> <span class="dec">404</span><span class="pun">}</span>
+    <span class="pun">}</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Can&#39;t display record&#34;</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">}</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="kwd">nil</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这个版本的viewRecord和原始版本的程度相同，但是现在每一行都有特别的意思，并且，我们提供更加友好的用户体验。
+ 这还没结束；我们将会在我们的应用中优化错误处理。一些想法：
+ - 给予每个错误处理一个漂亮的HTML模板
+ - 当用户是管理员时，将stack trace写到HTTP回应中，使debug更加简单
+ - 为appError写一个构建函数，用于存储stack trace，以便调试
+ - 在appHandler中发生panic时recover，将错误作为“危险”写入开发者控制台，并用户“发生了一个严重的错误”。 这是避免向用户暴露由于编程错误引起的不可预测的错误的信息的一个很好的想法。参看<a href="http://golang.org/doc/articles/defer_panic_recover.html">Defer, Panic, and Recover</a> 文章获取更多细节。</p>
+
+<h3>总结</h3>
+
+<p>适合的错误处理是一个好的软件的基本需求。根据本文所讨论的技术，你应该能够写出更可靠且更简洁的Go代码</p>
+
+<p>Andrew Gerrand 著</p>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<html>
+
+<head>
+    <title>MongoDB-Sharding常用命令</title>
+</head>
+
+<body>
+    <div>MongoDB-Sharding常用命令</div>
+    <div>2016-12-22 20:08:07</div>
+    <div><p>资料来源： <a href="https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/">https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/</a>
+详细命令参考： <a href="https://docs.mongodb.com/v3.2/reference/sharding/">https://docs.mongodb.com/v3.2/reference/sharding/</a></p>
+
+<h1>分片常用</h1>
+
+<h2>配置Sharding</h2>
+
+<ul>
+<li><p>连接路由服务器</p>
+
+<pre><code>.\bin\mongo.exe admin --port 40000
+</code></pre></li>
+
+<li><p>设置分片服务器</p>
+
+<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27017&#34; })
+或者
+sh.addShard(&#34;127.0.0.1:27100&#34;)
+</code></pre></li>
+
+<li><p>设置要分片的数据库</p>
+
+<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
+或者：
+sh.enableSharding(&#34;qdgame&#34;)
+</code></pre></li>
+
+<li><p>关闭balancing</p>
+
+<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre>
+
+<!-- more --></li>
+
+<li><p>设置要分片的collection</p>
+
+<pre><code>db.runCommand({ shardcollection: &#34;qdgame.backpack&#34;, key: { _id:1}})
+或者
+sh.shardCollection(&#34;qdgame.backpack&#34;,{usrid:1, id:1})
+</code></pre></li>
+
+<li><p>开启balancing</p>
+
+<pre><code>sh.enableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+</ul>
+
+<p>注意：设置一定要在admin数据库下。</p>
+
+<h2>使用hash分片一个collection</h2>
+
+<pre><code>sh.shardCollection( &#34;database.collection&#34;, { &lt;field&gt; : &#34;hashed&#34; } )
+</code></pre>
+
+<h2>改变chunk大小</h2>
+
+<pre><code>db.settings.save( { _id:&#34;chunksize&#34;, value: &lt;size&gt; } )
+</code></pre>
+
+<h2>添加index索引</h2>
+
+<pre><code>db.collection.ensureIndex({a:1,b:-1})
+</code></pre>
+
+<h1>管理分片标签</h1>
+
+<h2>标记一个分片</h2>
+
+<p>当连接到mongos实例时，使用sh.addShardTag（）方法将标记与特定分片关联。单个分片可以具有多个标签，并且多个分片也可以具有相同的标签。</p>
+
+<pre><code>sh.addShardTag(&#34;shard0000&#34;, &#34;NYC&#34;)
+sh.addShardTag(&#34;shard0001&#34;, &#34;NYC&#34;)
+sh.addShardTag(&#34;shard0002&#34;, &#34;SFO&#34;)
+sh.addShardTag(&#34;shard0002&#34;, &#34;NRT&#34;)
+</code></pre>
+
+<p>在连接到mongos实例时，您可以使用sh.removeShardTag（）方法从特定分片中删除标签，如以下示例所示，该示例从分片中删除NRT标签：</p>
+
+<pre><code>sh.removeShardTag(&#34;shard0002&#34;, &#34;NRT&#34;)
+</code></pre>
+
+<h2>标记shard key范围</h2>
+
+<p>在连接到mongos实例时使用sh.addTagRange（）方法来给某个范围的shard key添加标签。任何给定的分片键范围都只具有一个分配的标签。您不能重叠定义的范围，也不能多次标记同一范围。</p>
+
+<pre><code>sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;10001&#34; }, { zipcode: &#34;10281&#34; }, &#34;NYC&#34;)
+sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;11201&#34; }, { zipcode: &#34;11240&#34; }, &#34;NYC&#34;)
+sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;94102&#34; }, { zipcode: &#34;94135&#34; }, &#34;SFO&#34;)
+</code></pre>
+
+<h2>从shard key范围中删除标记</h2>
+
+<pre><code>use config
+db.tags.remove({ _id: { ns: &#34;records.users&#34;, min: { zipcode: &#34;10001&#34; }}, tag: &#34;NYC&#34; })
+</code></pre>
+
+<h2>访问标签</h2>
+
+<p>sh.status（）列出与每个分片相关联的分片（如果有的话）的标签。shard的标记存在于config数据库的shards
+集合中的shard文档中。</p>
+
+<pre><code>use config
+db.shards.find({ tags: &#34;NYC&#34; })
+</code></pre>
+
+<p>您可以在config数据库的tags集合中找到所有命名空间的标记范围。 sh.status（显示所有标签范围。要返回用NYC标记的所有shard key范围，请使用以下操作：</p>
+
+<pre><code>use config
+db.shards.find({ tags: &#34;NYC&#34; })
+</code></pre>
+
+<h1>例子：根据地区来划分数据</h1>
+
+<h2>场景</h2>
+
+<p>在messages集合中创建测试数据如下：</p>
+
+<pre><code>{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fa&#34;),
+  &#34;country&#34; : &#34;US&#34;,
+  &#34;userid&#34; : 123,
+  &#34;message&#34; : &#34;Hello there&#34;,
+  ...,
+}
+{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fb&#34;),
+  &#34;country&#34; : &#34;UK&#34;,
+  &#34;userid&#34; : 456,
+  &#34;message&#34; : &#34;Good Morning&#34;
+  ...,
+}
+{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fc&#34;),
+  &#34;country&#34; : &#34;DE&#34;,
+  &#34;userid&#34; : 789,
+  &#34;message&#34; : &#34;Guten Tag&#34;
+  ...,
+}
+</code></pre>
+
+<h3>shard key</h3>
+
+<p>messages集合使用{ country : 1, userid : 1 }组合索引作为shard key。
+每个文档中的country 字段允许在每个不同的country值上创建标签范围。
+相对于country，userid字段为shard key提供一个高基数低频率的元素</p>
+
+<h3>写操作</h3>
+
+<p>在Tag相关的分片中，mongos将到来的文档和配置的tag范围比较。如果文档符合配置标签的范围，mongos将此文档路由到此标签的分片中
+这插入环节，MongoDB可以将不合格任何tag范围的文档路甽�标签的范围，mongos将此文档路由到此标签的分片中
+这插入环节，MongoDB可以将不合格任何tag范围的文档路由到随机的分片中。</p>
+
+<h3>读操作</h3>
+
+<p>如果这个请求至少包含country字段，MongoDB可以路由请求到特定的分片中。
+例如MongoDB可以尝试对以下查询执行有针对性的读取操作：</p>
+
+<pre><code>chatDB = db.getSiblingDB(&#34;chat&#34;)
+chatDB.messages.find( { &#34;country&#34; : &#34;UK&#34; , &#34;userid&#34; : &#34;123&#34; } )
+</code></pre>
+
+<h3>均衡器</h3>
+
+<p>均衡器迁移带有tag的块（Chunk）到适合的分片（shard）。在迁移之前，分片可能包含违反配置的tag和tag范围的块。一旦平衡完成，碎片应只包含不违反其分配的标记和标记范围的块。
+添加个删除标签可以块的迁移。这取决于数据集的大小和标记范围影响的块数量，这些迁移可能会影响集群的性能。</p>
+
+<h2>操作</h2>
+
+<h3>取消均衡器</h3>
+
+<p>为了降低性能影响，可以在集合上禁用平衡器，以确保在配置新标记时不会发生迁移。考虑在特定的计划窗口中运行均衡器。</p>
+
+<pre><code>sh.disableBalancing(&#34;chat.message&#34;)
+</code></pre>
+
+<p>使用sh.isBalancerRunning()来检查平衡器进程当前是否正在运行。等待任何当前平衡回合完成后再继续。</p>
+
+<h3>为每一个分片添加标签</h3>
+
+<p>````
+sh.addShardTag(<shard name="">, “NA”)</shard></p>
+
+<pre><code>您可以通过运行sh.status（）来查看分配给给定分片的标签。
+
+### 定义标签范围
+使用sh.addTagRange()方法。这个方法需要：
+- 完成的目标collection的名字
+- 范围的下限
+- 范围的上限
+- 标签的名字
+
+</code></pre>
+
+<p>sh.addTagRange(
+  “chat.messages”,
+  { “country” : “US”, “userid” : MinKey },
+  { “country” : “US”, “userid” : MaxKey },
+  “NA”
+)</p>
+
+<pre><code>### 开启均衡器
+</code></pre>
+
+<p>sh.enableBalancing(“chat.message”)
+```
+使用sh.isBalancerRunning()来检查平衡器进程当前是否正在运行</p>
+
+<h3>查看更改</h3>
+
+<p>您可以使用sh.status()</p>
+</div>
+</body>
+
+</html>

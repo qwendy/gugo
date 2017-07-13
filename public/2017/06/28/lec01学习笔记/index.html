@@ -1,0 +1,153 @@
+<html>
+
+<head>
+    <title>lec01学习笔记</title>
+</head>
+
+<body>
+    <div>lec01学习笔记</div>
+    <div>2017-06-28 11:24:01</div>
+    <div><p>分为: 存储，通讯和计算
+关键点：实现，性能，容错和一致性。一致性和性能不可兼得
+split-brain的意思是A true split brain means multiple systems are online and have accessed an exclusive resource simultaneously</p>
+
+<p>MapReduce： 定义Map和Reduce函数，输入数组形式的数据。</p>
+
+<p>扩展：不互相等待，不共享数据。可并发执行。可单纯的配置更多的计算机来获得更多的吞吐量
+性能：Hard to build a network than can run 1000x faster than a single computer.So they cared about minimizing movement of data over the network.一般会被网络限制。尽量减少数据在网络上传输。
+容错：当Map和Reduce失败时，重新运行。他们仅仅是函数而已–他们不修改输入的内容，不用保存状态，不共享内存，没有Map-Map和Reduce-Reduce的交互。所以重新执行会得到相同的输出。纯函数（pure function）的这个需求是相对于其他并行编程方案的主要限制，也是MR简单的原因。</p>
+
+<p>MapReduce由Mater和Worker组成。Master给workers分配工作，决定worker运行map方法还是reduce方法。当worker执行错误，直接重启worker就好。
+master的调度程序</p>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">mr</span> <span class="pun">*</span><span class="typ">Master</span><span class="pun">)</span> <span class="pln">schedule</span><span class="pun">(</span><span class="pln">phase</span> <span class="pln">jobPhase</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="kwd">var</span> <span class="pln">ntasks</span> <span class="kwd">int</span>
+	<span class="kwd">var</span> <span class="pln">nios</span> <span class="kwd">int</span> <span class="com">// number of inputs (for reduce) or outputs (for map)</span>
+	<span class="kwd">switch</span> <span class="pln">phase</span> <span class="pun">{</span>
+	<span class="kwd">case</span> <span class="pln">mapPhase</span><span class="pun">:</span>
+		<span class="pln">ntasks</span> <span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">)</span>
+		<span class="pln">nios</span> <span class="pun">=</span> <span class="pln">mr</span><span class="pun">.</span><span class="pln">nReduce</span>
+	<span class="kwd">case</span> <span class="pln">reducePhase</span><span class="pun">:</span>
+		<span class="pln">ntasks</span> <span class="pun">=</span> <span class="pln">mr</span><span class="pun">.</span><span class="pln">nReduce</span>
+		<span class="pln">nios</span> <span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;Schedule: %v %v tasks (%d I/Os)\n&#34;</span><span class="pun">,</span> <span class="pln">ntasks</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">,</span> <span class="pln">nios</span><span class="pun">)</span>
+	<span class="kwd">var</span> <span class="pln">wg</span> <span class="pln">sync</span><span class="pun">.</span><span class="typ">WaitGroup</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">ntasks</span><span class="pun">;</span> <span class="pun">{</span>
+		<span class="pln">wg</span><span class="pun">.</span><span class="typ">Add</span><span class="pun">(</span><span class="dec">1</span><span class="pun">)</span>
+		<span class="pln">go</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">i</span><span class="pun">,</span> <span class="pln">nios</span> <span class="kwd">int</span><span class="pun">,</span> <span class="pln">phase</span> <span class="pln">jobPhase</span><span class="pun">)</span> <span class="pun">{</span>
+			<span class="pln">defer</span> <span class="pln">wg</span><span class="pun">.</span><span class="typ">Done</span><span class="pun">(</span><span class="pun">)</span>
+			<span class="pln">workrName</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">registerChannel</span>
+			<span class="kwd">for</span> <span class="kwd">true</span> <span class="pun">{</span>
+				<span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">call</span><span class="pun">(</span><span class="pln">workrName</span><span class="pun">,</span> <span class="str">&#34;Worker.DoTask&#34;</span><span class="pun">,</span> <span class="pun">&amp;</span><span class="typ">DoTaskArgs</span><span class="pun">{</span>
+					<span class="typ">JobName</span><span class="pun">:</span>       <span class="pln">mr</span><span class="pun">.</span><span class="pln">jobName</span><span class="pun">,</span>
+					<span class="typ">File</span><span class="pun">:</span>          <span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span>
+					<span class="typ">Phase</span><span class="pun">:</span>         <span class="pln">phase</span><span class="pun">,</span>
+					<span class="typ">TaskNumber</span><span class="pun">:</span>    <span class="pln">i</span><span class="pun">,</span>
+					<span class="typ">NumOtherPhase</span><span class="pun">:</span> <span class="pln">nios</span><span class="pun">,</span>
+				<span class="pun">}</span><span class="pun">,</span> <span class="kwd">new</span><span class="pun">(</span><span class="kwd">struct</span><span class="pun">{</span><span class="pun">}</span><span class="pun">)</span><span class="pun">)</span>
+				<span class="kwd">if</span> <span class="pln">ok</span> <span class="pun">{</span>
+					<span class="pln">go</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+						<span class="pln">mr</span><span class="pun">.</span><span class="pln">registerChannel</span> <span class="pun">&lt;</span><span class="pun">-</span> <span class="pln">workrName</span>
+					<span class="pun">}</span><span class="pun">(</span><span class="pun">)</span>
+					<span class="kwd">return</span>
+				<span class="pun">}</span>
+			<span class="pun">}</span>
+
+		<span class="pun">}</span><span class="pun">(</span><span class="pln">i</span><span class="pun">,</span> <span class="pln">nios</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">wg</span><span class="pun">.</span><span class="typ">Wait</span><span class="pun">(</span><span class="pun">)</span>
+	<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;Schedule: %v phase done\n&#34;</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>map方法读入input数据，使用mapF将数据处理之后，将处理后的数据存在指定的中间文件中，中间文件的文件名决定此文件将由哪个reduce执行。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">doMap</span><span class="pun">(</span>
+	<span class="pln">jobName</span> <span class="pln">string</span><span class="pun">,</span> <span class="com">// the name of the MapReduce job</span>
+	<span class="pln">mapTaskNumber</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// which map task this is</span>
+	<span class="pln">inFile</span> <span class="pln">string</span><span class="pun">,</span>
+	<span class="pln">nReduce</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// the number of reduce task that will be run (&#34;R&#34; in the paper)</span>
+	<span class="pln">mapF</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">file</span> <span class="pln">string</span><span class="pun">,</span> <span class="pln">contents</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">[</span><span class="pun">]</span><span class="typ">KeyValue</span><span class="pun">,</span>
+<span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">content</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">ioutil</span><span class="pun">.</span><span class="typ">ReadFile</span><span class="pun">(</span><span class="pln">inFile</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;read input file content &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">kvs</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">mapF</span><span class="pun">(</span><span class="pln">inFile</span><span class="pun">,</span> <span class="pln">string</span><span class="pun">(</span><span class="pln">content</span><span class="pun">)</span><span class="pun">)</span>
+	<span class="pln">files</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="pun">*</span><span class="pln">os</span><span class="pun">.</span><span class="typ">File</span><span class="pun">{</span><span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">nReduce</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+		<span class="pln">fileName</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">reduceName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">mapTaskNumber</span><span class="pun">,</span> <span class="pln">i</span><span class="pun">)</span>
+		<span class="pln">file</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Create</span><span class="pun">(</span><span class="pln">fileName</span><span class="pun">)</span>
+		<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+			<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Create File&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="pun">}</span>
+		<span class="pln">defer</span> <span class="pln">file</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+		<span class="pln">files</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">files</span><span class="pun">,</span> <span class="pln">file</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">kv</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">kvs</span> <span class="pun">{</span>
+		<span class="pln">e</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewEncoder</span><span class="pun">(</span><span class="pln">files</span><span class="pun">[</span><span class="kwd">int</span><span class="pun">(</span><span class="pln">ihash</span><span class="pun">(</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">)</span><span class="pun">)</span><span class="pun">%</span><span class="pln">nReduce</span><span class="pun">]</span><span class="pun">)</span>
+		<span class="pln">e</span><span class="pun">.</span><span class="typ">Encode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">kv</span><span class="pun">)</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>reduce读取指定的中间文件，使用reduceF处理后，输出结果。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">doReduce</span><span class="pun">(</span>
+	<span class="pln">jobName</span> <span class="pln">string</span><span class="pun">,</span> <span class="com">// the name of the whole MapReduce job</span>
+	<span class="pln">reduceTaskNumber</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// which reduce task this is</span>
+	<span class="pln">nMap</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// the number of map tasks that were run (&#34;M&#34; in the paper)</span>
+	<span class="pln">reduceF</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">key</span> <span class="pln">string</span><span class="pun">,</span> <span class="pln">values</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pln">string</span><span class="pun">,</span>
+<span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">kvMap</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">make</span><span class="pun">(</span><span class="kwd">map</span><span class="pun">[</span><span class="pln">string</span><span class="pun">]</span><span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span>
+
+	<span class="com">// 读取同一个 reduce task 下的所有文件，保存至哈希表</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">nMap</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+		<span class="pln">filename</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">reduceName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">reduceTaskNumber</span><span class="pun">)</span>
+		<span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="pln">filename</span><span class="pun">)</span>
+		<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+			<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Open File Err: &#34;</span><span class="pun">,</span> <span class="pln">filename</span><span class="pun">)</span>
+		<span class="pun">}</span>
+		<span class="pln">defer</span> <span class="pln">f</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+		<span class="pln">decoder</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewDecoder</span><span class="pun">(</span><span class="pln">f</span><span class="pun">)</span>
+		<span class="kwd">var</span> <span class="pln">kv</span> <span class="typ">KeyValue</span>
+		<span class="kwd">for</span> <span class="pln">decoder</span><span class="pun">.</span><span class="typ">More</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+			<span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">decoder</span><span class="pun">.</span><span class="typ">Decode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">kv</span><span class="pun">)</span>
+			<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+				<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Json decode failed, &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+			<span class="pun">}</span>
+			<span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">kv</span><span class="pun">.</span><span class="typ">Value</span><span class="pun">)</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+
+	<span class="com">// 对= nil {</span>
+				<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Json decode failed, &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+			<span class="pun">}</span>
+			<span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">kv</span><span class="pun">.</span><span class="typ">Value</span><span class="pun">)</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+
+	<span class="com">// 对哈希表所有 key 进行升序排序</span>
+	<span class="pln">keys</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">{</span><span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">k</span><span class="pun">,</span> <span class="pln">_</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">kvMap</span> <span class="pun">{</span>
+		<span class="pln">keys</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">keys</span><span class="pun">,</span> <span class="pln">k</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">sort</span><span class="pun">.</span><span class="typ">Strings</span><span class="pun">(</span><span class="pln">keys</span><span class="pun">)</span>
+	<span class="pln">mergeFile</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Create</span><span class="pun">(</span><span class="pln">mergeName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">reduceTaskNumber</span><span class="pun">)</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Create Merge File Err: &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">defer</span> <span class="pln">mergeFile</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+	<span class="pln">encoder</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewEncoder</span><span class="pun">(</span><span class="pln">mergeFile</span><span class="pun">)</span>
+	<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">k</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">keys</span> <span class="pun">{</span>
+		<span class="pln">encoder</span><span class="pun">.</span><span class="typ">Encode</span><span class="pun">(</span><span class="typ">KeyValue</span><span class="pun">{</span><span class="pln">k</span><span class="pun">,</span> <span class="pln">reduceF</span><span class="pun">(</span><span class="pln">k</span><span class="pun">,</span> <span class="pln">kvMap</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span><span class="pun">)</span><span class="pun">}</span><span class="pun">)</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>(课程),<a href="实验的代码">https://github.com/qwendy/Distributed-Systems/tree/master/Lec01_Introduction</a>[<a href="https://github.com/qwendy/Distributed-Systems/tree/master/6.824/src/mapreduce">https://github.com/qwendy/Distributed-Systems/tree/master/6.824/src/mapreduce</a>]</p>
+</div>
+</body>
+
+</html>

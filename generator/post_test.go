@@ -21,7 +21,7 @@ func TestNewPost(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				sourcePath:  "../source/_post/test.md",
+				sourcePath:  "../source/_post/（翻译）Sharding-mongo官方文档3-2版本.md",
 				destination: "../public",
 				t:           tpl,
 			},
@@ -30,27 +30,9 @@ func TestNewPost(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			post := NewPost(tt.args.sourcePath, tt.args.destination, tt.args.t)
-			if err := post.Fetch(); err != nil {
+			if err := post.BatchHandle(); err != nil {
 				t.Error(err)
-				return
 			}
-			if err := post.ParseMetaData(); err != nil {
-				t.Error(err)
-				return
-			}
-			if err := post.Convert(); err != nil {
-				t.Error(err)
-				return
-			}
-			if err := post.CreateDestinationPath(); err != nil {
-				t.Error(err)
-				return
-			}
-			if err := post.Generate(); err != nil {
-				t.Error(err)
-				return
-			}
-			t.Errorf("Meta:%+v,loc:%v", post.Meta, post.Location)
 		})
 	}
 }

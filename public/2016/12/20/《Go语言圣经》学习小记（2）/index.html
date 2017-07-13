@@ -1,0 +1,248 @@
+<html>
+
+<head>
+    <title>《Go语言圣经》学习小记（2）</title>
+</head>
+
+<body>
+    <div>《Go语言圣经》学习小记（2）</div>
+    <div>2016-12-20 19:45:22</div>
+    <div><h2>函数</h2>
+
+<h3>函数声明</h3>
+
+<p>在函数体中，函数的形参作为局部变量，被初始化为调用者提供的值。函数的形参和有名返回值作为<strong>函数最外层的局部变量</strong>，被存储在相同的词法块中。
+实参通过值的方式传递，因此函数的形参是实参的拷贝。对形参进行修改不会影响实参。但是，如果实参包括引用类型，如指针，slice(切片)、map、<strong>function</strong>、channel等类型，实参可能会由于函数的简介引用被修改。
+<strong>没有函数体的函数声明，这表示该函数不是以Go实现的。</strong>这样的声明定义了函数标识符。</p>
+
+<pre><span class="kwd">package</span> <span class="pln">math</span>
+<span class="kwd">func</span> <span class="typ">Sin</span><span class="pun">(</span><span class="pln">x</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="kwd">float</span> <span class="com">//implemented in assembly language</span>
+</pre>
+
+<p>注：此代码来自官方的math包中
+<!-- more --></p>
+
+<h3>错误</h3>
+
+<p>在Go中，函数运行失败时会返回错误信息，这些错误信息被认为是一种预期的值而非异常（exception）。</p>
+
+<h3>函数值</h3>
+
+<p>在Go中，函数被看作第一类值（first-class values）：函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">square</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">n</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
+<span class="kwd">func</span> <span class="pln">negative</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pun">-</span><span class="pln">n</span> <span class="pun">}</span>
+<span class="kwd">func</span> <span class="pln">product</span><span class="pun">(</span><span class="pln">m</span><span class="pun">,</span> <span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">m</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
+<span class="pln">f</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">square</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;9&#34;</span>
+<span class="pln">f</span> <span class="pun">=</span> <span class="pln">negative</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;-3&#34;</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span> <span class="com">// &#34;func(int) int&#34;</span>
+<span class="pln">f</span> <span class="pun">=</span> <span class="pln">product</span> <span class="com">// compile error: can&#39;t assign func(int, int) int to func(int) int</span>
+</pre>
+
+<p>函数类型的零值是nil。调用值为nil的函数值会引起panic错误
+函数值可以与nil比较
+但是函数值之间是不可比较的，也不能用函数值作为map的key。</p>
+
+<h3>匿名函数</h3>
+
+<p>拥有函数名的函数只能在包级语法块中被声明，通过函数字面量（function literal），我们可绕过这一限制，在任何表达式中表示一个函数值。</p>
+
+<pre>	<span class="kwd">var</span> <span class="pln">visitAll</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span>
+	<span class="pln">visitAll</span> <span class="pun">=</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">{</span>
+		<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">item</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">items</span> <span class="pun">{</span>
+			<span class="kwd">if</span> <span class="pun">!</span><span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">{</span>
+				<span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">true</span>
+				<span class="pln">visitAll</span><span class="pun">(</span><span class="pln">m</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span><span class="pun">)</span>
+				<span class="pln">order</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">order</span><span class="pun">,</span> <span class="pln">item</span><span class="pun">)</span>
+			<span class="pun">}</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+</pre>
+
+<p>当匿名函数需要被递归调用时，我们必须首先声明一个变量（在上面的例子中，我们首先声明visitAll），再将匿名函数赋值给这个变量。如果不分成两部，函数字面量无法与visitAll绑定.</p>
+
+<h3>警告：捕获迭代变量</h3>
+
+<p><strong>这节极其重要！！！</strong></p>
+
+<p>本节，将介绍Go词法作用域的一个陷阱。请务必仔细的阅读，弄清楚发生问题的原因。即使是经验丰富
+的程序员也会在这个问题上犯错误。
+考虑这个样一个问题：你被要求首先创建一些目录，再将目录删除。在下面的例子中我们用函数值来完
+成删除操作。下面的示例代码需要引入os包。为了使代码简单，我们忽略了所有的异常处理。</p>
+
+<p>// …do some work…
+for _, rmdir := range rmdirs {
+rmdir() // clean up
+}
+你可能会感到困惑，为什么要在循环体中用循环变量d赋值一个新的局部变量，而不是像下面的代码一样
+直接使用循环变量dir。需要注意，下面的代码是错误的。</p>
+
+<pre><span class="kwd">var</span> <span class="pln">rmdirs</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span>
+<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">d</span>               <span class="com">// NOTE: necessary!</span>
+	<span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// creates parent directories too</span>
+	<span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+		<span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">)</span>
+	<span class="pun">}</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>问题的原因在于循环变量的作用域。在上面的程序中，for循环语句引入了新的词法块，循环变量dir在这个词法块中被声明。在该循环中生成的所有函数值都共享相同的循环变量。需要注意，函数值中记录的是循环变量的内存地址，而不是循环变量某一时刻的值。以dir为例，后续的迭代会不断更新dir的值，当删除操作执行时，for循环已完成，dir中存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个�存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个问题，我们会引入一个与循环变量同名的局部变量，作为循环变量的副本。比如下面的变量dir，虽然这看起来很奇怪，但却很有用。</p>
+
+<pre><span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dir</span> <span class="com">// declares inner dir, initialized to outer dir</span>
+    <span class="com">// ...</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这个问题不仅存在基于range的循环，在下面的例子中，对循环变量i的使用也存在同样的问题：</p>
+
+<pre><span class="pln">dirs</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span>
+<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+    <span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// OK</span>
+    <span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+        <span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// NOTE: incorrect!</span>
+    <span class="pun">}</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>如果你使用go语句（第八章）或者defer语句（5.8节）会经常遇到此类问题。这不是go或defer本身导致
+的，而是因为它们都会等待循环结束后，再执行函数值。</p>
+
+<p><strong>注：for的词法作用域导致循环的时候，dir为同一个内存地址，传递给Println函数的是dir的值。</strong></p>
+
+<pre><span class="kwd">func</span> <span class="pln">main</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
+    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">v</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">c</span> <span class="pun">{</span>
+        <span class="pln">defer</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">v</span><span class="pun">)</span>
+        <span class="pun">}</span><span class="pun">(</span><span class="pun">)</span>
+    <span class="pun">}</span>
+    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="str">&#34;Over&#34;</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<h3>可变参数</h3>
+
+<p>在声明可变参数函数时，需要在参数列表的最后一个参数类型之前加上省略符号“…”，这表示该函数会接收任意数量的<strong>该类型参数</strong>。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">sum</span><span class="pun">(</span><span class="pln">vals</span> <span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span>
+    <span class="pln">total</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span>
+    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">val</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">vals</span> <span class="pun">{</span>
+        <span class="pln">total</span> <span class="pun">+</span><span class="pun">=</span> <span class="pln">val</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="pln">total</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在函数体中,vals被看作是类型为[] int的切片。</p>
+
+<h2>方法</h2>
+
+<p>尽管没有被大众所接受的明确的OOP的定义，从我们的理解来讲，一个对象其实也就是一个简单的值或者一个变量，在这个对象中会包含一些方法，而一个方法则是一个一个和特殊类型关联的函数。一个面向对象的程序会用方法来表达其属性和对应的操作，这样使用这个对象的用户就不需要直接去操作对象，而是借助方法来做这些事情。</p>
+
+<h3>方法声明</h3>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">p</span> <span class="typ">Point</span><span class="pun">)</span> <span class="typ">Distance</span><span class="pun">(</span><span class="pln">q</span> <span class="typ">Point</span><span class="pun">)</span> <span class="kwd">float64</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">math</span><span class="pun">.</span><span class="typ">Hypot</span><span class="pun">(</span><span class="pln">q</span><span class="pun">.</span><span class="typ">X</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">X</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>上面的代码里那个附加的参数p，叫做方法的接收器(receiver)，早期的面向对象语言留下的遗产将调用
+一个方法称为“向一个对象发送消息”。
+在Go语言中，我们并不会像其它语言那样用this或者self作为接收器；我们可以任意的选择接收器的名字。由于接收器的名字经常会被使用到，所以保持其在方法间传递时的一致性和简短性是不错的主意。这里的建议是可以使用其类型的第一个字母，比如这里使用了Point的首字母p。</p>
+
+<h2>接口</h2>
+
+<p>在Go语言中，变量总是被一个定义明确的值初始化，即使接口类型也不例外。对于一个接口的零值就是它的类型和值的部分都是nil</p>
+
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th align="center">value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>type</td>
+<td align="center">nil</td>
+</tr>
+
+<tr>
+<td>value</td>
+<td align="center">nil</td>
+</tr>
+</tbody>
+</table>
+
+<p>一个接口值可以持有任意大的动态值。接口值可以使用＝＝和！＝来进行比较。两个接口值相等仅当它们都是nil值或者它们的动态类型相同并且动态值也根据这个动态类型的＝＝操作相等。</p>
+
+<h2>GoRoutines 和 channels</h2>
+
+<h3>Channels</h3>
+
+<p>和map类似，channel也一个对应make创建的底层数据结构的引用。
+复制一个channel或用于函数参数传递时，只是拷贝了一个channel引用，因此调用者和被调用者将引用同一channel对象。和其它的引用类型一样，channel的零值也是nil。
+两个相同类型的channel可以使用==运算符比较。如果两个channel引用的是相通的对象，那么比较的结果为真
+当一个channel被关闭后，再向该channel发送数据将导致panic异常。当一个被关闭的channel中已经发送的数据都被成功接收后，后续的接收操作将不再阻塞，它们会立即返回一个零值。</p>
+
+<h3>不带缓存的Channels</h3>
+
+<p>基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。
+你并不需要关闭每一个channel。只要当需要告诉接收者goroutine，所有的数据已经全部发送时才需要关闭channel。不管一个channel是否被关闭，当它没有被引用时将会被Go语言的垃圾自动回收器回收。（不要将关闭一个打开文件的操作和关闭一个channel操作混淆。对于每个打开的文件，都需要在不使用的使用调用对应的Close方法来关闭文件。）</p>
+
+<h3>基于select的多路复用</h3>
+
+<p>如果多个case同时就绪时，select会随机地选择一个执行，这样来保证每一个channel都有平等的被select的机会。</p>
+
+<pre><span class="kwd">for</span> <span class="pun">{</span>
+    <span class="pln">select</span> <span class="pun">{</span>
+    <span class="kwd">case</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">done</span><span class="pun">:</span>
+        <span class="com">// Drain fileSizes to allow existing goroutines to finish.</span>
+        <span class="kwd">for</span> <span class="pln">range</span> <span class="pln">fileSizes</span> <span class="pun">{</span>
+            <span class="com">// Do nothing.</span>
+        <span class="pun">}</span>
+        <span class="kwd">return</span>
+    <span class="kwd">case</span> <span class="pln">size</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">fileSizes</span><span class="pun">:</span>
+        <span class="com">// ...</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在结束之前我们需要把fileSizes channel中的内容“排”空，在channel被关闭之前，舍弃掉所有值。</p>
+
+<h2>基于共享变量的并发</h2>
+
+<h3>竞争条件</h3>
+
+<p>一个函数在线性程序中可以正确地工作。如果在并发的情况下，这个函数依然可以正确地工 作的话，那么我们就说这个函数是并发安全的，并发安全的函数不需要额外的同步工作。我们可以把这 个概念概括为一个特定类型的一些方法和操作函数，如果这个类型是并发安全的话，那么所有它的访问 方法和操作就都是并发安全的。
+竞争条件指的是程序在多个goroutine交叉执行操作时，没有给出正确的结果。竞争条件是很恶劣的一种场景，因为这种问题会一直潜伏在你的程序里，然后在非常少见的时候蹦出来
+<strong>数据竞争的定义</strong>：数据竞争会在两个以上的goroutine并发访问相同的变量且至少其中一个为写操作时发生。根据上述定义，有三种方式可以避免数据竞争：
+- 第一种方法是不要去写变量。
+- 第二种避免数据竞争的方法是，避免从多个goroutine访问变量。1. 变量都被限定在了一个单独的goroutine中。 由于其它的goroutine不能够直接访问变量，它们只能使用一个channel来发送给指定的goroutine请求来查询更新变量。这也就是Go的口头禅“不要使用共享数据来通信；使用通信来共享数据”。一个提供对 一个指定的变量通过cahnnel来请求goroutine叫做这个变量的监控(monitor)goroutine。2.即使当一个变量无法在其整个生命周期内被绑定到一个独立的goroutine，绑定依然是并发问题的一个解 决方案。例如在一条流水线上的goroutine之间共享变量是很普遍的行为，在这两者间会通过channel来传输地址信息。（注： 串行channel）
+- 第三种避免数据竞争的方法是允许很多goroutine去访问变量，但是在同一个时刻最多只有一个 goroutine在访问。这种方式被称为“互斥”</p>
+
+<h3>Goroutines和线程</h3>
+
+<p>每一个OS线程都有一个固定大小的内存块(一般会是2MB)来做栈，这个栈会用来存储当前正在被调用或挂 起(指在调用其它函数时)的函数的内部变量。
+一个goroutine会以一个很小的栈开始其生命周期，一般只需要2KB。一个goroutine的栈，和操作 系统线程一样，会保存其活跃或挂起的函数调用的本地变量，但是和OS线程不太一样的是一个goroutine 的栈大小并不是固定的；栈的大小会根据需要动态地伸缩。而goroutine的栈的最大值有1GB，比传统的 固定大小的线程栈要大得多，</p>
+
+<h3>Goroutine调度</h3>
+
+<p>OS线程会被操作系统内核调度。每几毫秒，一个硬件计时器会中断处理器，这会调用一个叫作scheduler 的内核函数。这个函数会挂起当前执行的线程并保存内存中它的寄存器内容，检查线程列表并决定下一 次哪个线程可以被运行，并从内存中恢复该线程的寄存器信息，然后恢复执行该线程的现场并开始执行 线程。因为操作系统线程是被内核所调度，所以从一个线程向另一个“移动”需要完整的上下文切换， 也就是说，保存一个用户线程的状态到内存，恢复另一个线程的到寄存器，然后更新调度器的数据结 构。这几步操作很慢，因为其局部性很差需要几次内存访问，并且会增加运行的cpu周期。</p>
+
+<p>Go的运行时包含了其自己的调度器，这个调度器使用了一些技术手段，比如m:n调度，因为其会在n个操 作系统线程上多工(调度)m个goroutine。Go调度器的工作和内核的调度是相似的，但是这个调度器只关 注单独的Go程序中的goroutine(译注：按程序独立)。
+和操作系统的线程调度不同的是，Go调度器并不是用一个硬件定时器而是被Go语言”建筑”本身进行调度 的。例如当一个goroutine调用了time.Sleep或者被channel调用或者mutex操作阻塞时，调度器会使其进 入休眠并开始执行另一个goroutine直到时机到了再去唤醒第一个goroutine。因为因为这种调度方式不 需要进入内核的上下文，所以重新调度一个goroutine比调度一个线程代价要低得多。</p>
+
+<h2>包和工具</h2>
+
+<p>有时候，一个中间的状态可能也是有用的，对于一小部分信任的包是可见的，但并不是对所有调用者都 可见。例如，当我们计划将一个大的包拆分为很多小的更容易维护的子包，但是我们并不想将内部的子 包结构也完全暴露出去。同时，我们可能还希望在内部子包之间共享一些通用的处理包，或者我们只是 想实验一个新包的还并不稳定的接口，暂时只暴露给一些受限制的用户使用。
+为了满足这些需求，Go语言的构建工具对包含internal名字的路径段的包导入路径做了特殊处理。这种 包叫internal包，一个internal包只能被和internal目录有同一个父目录的包所导入。</p>
+</div>
+</body>
+
+</html>

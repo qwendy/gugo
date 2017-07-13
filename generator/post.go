@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/go-yaml/yaml"
 	"github.com/henrylee2cn/pholcus/common/goquery"
 	"github.com/russross/blackfriday"
@@ -51,6 +53,25 @@ func NewPost(sourcePath string, destination string, t *template.Template) *Post 
 	}
 }
 
+func (post *Post) BatchHandle() error {
+	if err := post.Fetch(); err != nil {
+		return err
+	}
+	if err := post.ParseMetaData(); err != nil {
+		return err
+	}
+	if err := post.Convert(); err != nil {
+		return err
+	}
+	if err := post.CreateDestinationPath(); err != nil {
+		return err
+	}
+	if err := post.Generate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // get source markdown file
 func (p *Post) Fetch() error {
 	input, err := ioutil.ReadFile(p.SourcePath)
@@ -63,24 +84,28 @@ func (p *Post) ParseMetaData() (err error) {
 	buf := bufio.NewReader(bytes.NewReader(p.sourceData))
 	metaData := []byte{}
 	ok := false
+	finished := false
 	// get the data between the line only have "---"
-	for true {
-		line, _, lineErr := buf.ReadLine()
+	for !finished {
+		line, isPrefix, lineErr := buf.ReadLine()
 		if lineErr != nil {
 			break
 		}
 		if string(line) == "---" {
 			if ok == true {
-				break
+				finished = true
 			}
 			ok = true
 		}
 		if ok {
-			line = append(line, []byte("\r\n")...)
+			if !isPrefix {
+				line = append(line, []byte("\n")...)
+			}
 			metaData = append(metaData, line...)
 		}
 	}
-	if !ok {
+	log.Debugf("metadata: %v", string(metaData))
+	if !ok || !finished {
 		return fmt.Errorf("Cannot find the metadata of the post!")
 	}
 	err = yaml.Unmarshal(metaData, p.Meta)
