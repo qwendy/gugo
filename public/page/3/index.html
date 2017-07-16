@@ -153,7 +153,7 @@
             <div class="right item">
                 <div class="ui animated fade button" tabindex="0">
                     <div class="visible content">赋此间一抹丹砂</div>
-                    <div class="hidden content"><a href="">清狂</a></div>
+                    <div class="hidden content"><a href="">回到顶端</a></div>
                 </div>
             </div>
         </div>
@@ -204,178 +204,11 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 
-                <h3 class="ui header">《Go语言圣经》学习小记（1）</h3>
-                <div class="postContent">
-                    <p>记录《Go语言圣经》学习笔记。（实为划重点）</p>
-
-<p>顺序通信进程 （ communicating sequential processes ，缩写为CSP）。在CSP中，程序是一组中间没有共享状态的平行运行的处理过程，它们之间使用管道进行通信和控制同步。
-Go语言的官方博客 <a href="https://blog.golang.org">https://blog.golang.org</a> 会不定期发布一些Go语言最好的实践文章，包括当前语言的发展状态、未来 的计划、会议报告和Go语言相关的各种会议的主题等信息（译注： <a href="http://talks.golang.org/">http://talks.golang.org/</a> 包含了 官方收录的各种报告的讲稿）。
-<!-- more --></p>
-
-<h3>第一章 入门</h3>
-
-<p>对map进行range循环时，其迭代顺序是不确定的，从实践来看，很可能每次运行都会有不一样的结果（译注：这是Go语言的设计者有意为之的，因为其底层实现不保证插入顺序和遍历顺序一致，也希望程序员不要依赖遍历时的顺序，所以干脆直接在遍历的时候做了随机化处理，醉了。补充：好像说随机序可以防止某种类型的攻击，虽然不太明白，但是感觉还蛮厉害的），来避免程序员在业务中依赖遍历时的顺序。
-map是用make函数创建的数据结构的一个<strong>引用</strong>。当一个map被作为参数传递给一个函数时，函数接收到的是一份<strong>引用的拷贝</strong>，虽然本身并不是一个东西，但因为他们指向的是同一块数据对象（译注：类似于C++里的引用传递，实际上指针是另一个指针了，但内部存的值指向同一块内存），所以你在函数里对map里的值进行修改时，原始的map内的值也会改变。</p>
-
-<h3>第二章 程序结构</h3>
-
-<p>如果初始化表达式被省略，那么将用零值初始化该变量。 数值类型变量对应的零值是0，布尔类型变量对应的零值是false，字符串类型对应的零值是空字符串，接口或引用类型（包括slice、map、chan和函数）变量对应的零值是nil。数组或结构体等聚合类型对应的零值是每个元素或字段都是对应该类型的零值。
-var形式的声明语句往往是用于需要显式指定变量类型地方，或者因为变量稍后会被重新赋值而初始值无关紧要的地方。
-任何类型的指针的零值都是nil。。如果p != nil测试为真，那么p是指向某个有效变量。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
-每次调用new函数都是返回一个新的变量的地址，当然也可能有特殊情况：如果两个类型都是空的，也就是说类型的大小是0，例如struct{}和 [0]int,有可能有相同的地址（依赖具体的语言实现）（译注：请谨慎使用大小为0的类型，因为如果类型的大小为0的话，可能导致Go语言的自动垃圾回收器有不同的行为，具体请查看runtime.SetFinalizer函数相关文档）。</p>
-
-<h3>第三章 基础数据类型</h3>
-
-<p>一个字符串是一个不可改变的字节序列。内置的len函数可以返回一个字符串中的字节数目（不是rune字符数目），索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束。字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串：</p>
-
-<pre><span class="pln">s</span> <span class="pun">:</span><span class="pun">=</span> <span class="str">&#34;left foot&#34;</span>
-<span class="pln">t</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">s</span>
-<span class="pln">s</span> <span class="pun">+</span><span class="pun">=</span> <span class="str">&#34;, right foot&#34;</span>
-</pre>
-
-<p>这并不会导致原始的字符串值被改变，但是变量s将因为+=语句持有一个新的字符串值，但是t依然是包含原先的字符串值。
-Go语言的常量有个不同寻常之处。虽然一个常量可以有任意有一个确定的基础类型，例如int或float64，或者是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类�是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类型的数字常量提供比基础类型更高精度的算术运算。
-无类型的常量不仅可以提供更高的运算精度，而且可以直接用于更多的表达式而不需要显式的类型转换。
-例如math包中的Pi常量：</p>
-
-<pre>	<span class="typ">Pi</span>  <span class="pun">=</span> <span class="dec">3.14159265358979323846264338327950288419716939937510582097494459</span> <span class="com">//http://oeis.org/A000796</span>
-</pre>
-
-<h3>第四章 符合数据类型</h3>
-
-<h4>数组</h4>
-
-<p>在数组字面值中，如果在数组的长度位置出现的是“…”省略号，则表示数组的长度是根据初始化值的个数来计算。数组的长度必须是常量表达式，因为数组的长度需要在编译阶段确定。</p>
-
-<pre><span class="pln">q</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">)</span> <span class="com">// &#34;[3]int&#34;</span>
-</pre>
-
-<p>也可以指定一个索引和对应值列表的方式初始化，就像下面这样：</p>
-
-<pre><span class="kwd">type</span> <span class="typ">Currency</span> <span class="kwd">int</span>
-
-<span class="kwd">const</span> <span class="pun">(</span>
-	<span class="typ">USD</span> <span class="typ">Currency</span> <span class="pun">=</span> <span class="pln">iota</span> <span class="com">// 美元</span>
-	<span class="typ">EUR</span>                 <span class="com">// 欧元</span>
-	<span class="typ">GBP</span>                 <span class="com">// 英镑</span>
-	<span class="typ">RMB</span>                 <span class="com">// 人民币</span>
-<span class="pun">)</span>
-<span class="pln">symbol</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="pln">string</span><span class="pun">{</span><span class="typ">USD</span><span class="pun">:</span> <span class="str">&#34;$&#34;</span><span class="pun">,</span> <span class="typ">EUR</span><span class="pun">:</span> <span class="str">&#34;€&#34;</span><span class="pun">,</span> <span class="typ">GBP</span><span class="pun">:</span> <span class="str">&#34;￡&#34;</span><span class="pun">,</span> <span class="typ">RMB</span><span class="pun">:</span> <span class="str">&#34;￥&#34;</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="typ">RMB</span><span class="pun">,</span> <span class="pln">symbol</span><span class="pun">[</span><span class="typ">RMB</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// &#34;3 ￥&#34;</span>
-</pre>
-
-<p>如果一个数组的元素类型是可以相互比较的，那么数组类型也是可以相互比较的，这时候我们可以直接通过==比较运算符来比较两个数组，只有当两个数组的所有元素都是相等的时候数组才是相等的。不相等比较运算符!=遵循同样的规则。(斩风注: 这里的比较仅指相等和不等。<strong>大于小于不包含在此类</strong>，<strong>数组长度类型必须相同</strong>)</p>
-
-<pre><span class="pln">a</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">b</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">b</span><span class="pun">,</span> <span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">,</span> <span class="pln">b</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">)</span> <span class="com">// &#34;true false false&#34;</span>
-<span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">3</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">d</span><span class="pun">)</span> <span class="com">// compile error: cannot compare [2]int == [3]int</span>
-</pre>
-
-<h4>slice</h4>
-
-<p>一个slice是一个轻量级的数据结构，提供了访问数组子序列（或者全部）元素的功能，而且slice的底层确实引用一个数组对象。一个slice由三个部分构成：指针、长度和容量。指针指向第一个slice元素对应的底层数组元素的地址，要注意的是slice的第一个元素并不一定就是数组的第一个元素。（斩风注：slice可能是数组的中间部分。）长度对应slice中元素的数目；长度不能超过容量，容量一般是从slice的开始位置到底层数据的结尾位置。内置的len和cap函数分别返回slice的长度和容量。
-复制一个slice只是对底层的数组创建了一个新的slice别名。
-和数组不同的是，slice之间不能比较，因此我们不能使用==操作符来判断两个slice是否含有全部相等元素。不过标准库提供了高度优化的bytes.Equal函数来判断两个字节型slice是否相等（[]byte），但是对于其他类型的slice，我们必须自己展开每个元素进行比较。
-一个零值的slice等于nil。一个nil值的slice并没有底层数组。一个nil值的slice的长度和容量都是0，但是也有非nil值的slice的长度和容量也是0的，例如[]int{}或make([]int, 3)[3:]。与任意类型的nil值一样，我们可以用[]int(nil)类型转换表达式来生成一个对应类型slice的nil值。</p>
-
-<pre><span class="kwd">var</span> <span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span>    <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">nil</span>        <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">(</span><span class="kwd">nil</span><span class="pun">)</span> <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="pun">}</span>    <span class="com">// len(s) == 0, s != nil</span>
-</pre>
-
-<p>如果你需要测试一个slice是否是空的，使用len(s) == 0来判断，而不应该用s == nil来判断。
-内置的append函数可能使用比appendInt更复杂的内存扩展策略。因此，通常我们并不知道append调用是否导致了内存的重新分配，因此我们也不能确认新的slice和原始的slice是否引用的是相同的底层数组空间。同样，我们不能确认在原先的slice上的操作是否会影响到新的slice。因此，通常是将append返回的结果直接赋值给输入的slice变量。</p>
-
-<p>练习 4.3： 重写reverse函数，使用数组指针代替slice。</p>
-
-<pre><span class="kwd">func</span> <span class="pln">reverseV2</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">*</span><span class="pun">[</span><span class="dec">10</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
-	<span class="kwd">for</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">,</span> <span class="dec">9</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">j</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">=</span> <span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">,</span> <span class="pln">j</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
-		<span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span> <span class="pun">=</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
-	<span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>练习 4.4： 编写一个rotate函数，通过一次循环完成镟转。</p>
-
-<pre><span class="kwd">func</span> <span class="pln">forwardRotate</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">,</span> <span class="pln">x</span> <span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
-	<span class="pln">mid</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">x</span>
-	<span class="pln">k</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">mid</span>
-	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
-		<span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span> <span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
-		<span class="pln">k</span><span class="pun">+</span><span class="pun">+</span>
-		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">mid</span> <span class="pun">{</span>
-			<span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
-				<span class="kwd">return</span>
-			<span class="pun">}</span>
-			<span class="pln">mid</span> <span class="pun">=</span> <span class="pln">k</span>
-		<span class="pun">}</span> <span class="kwd">else</span> <span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
-			<span class="pln">k</span> <span class="pun">=</span> <span class="pln">mid</span>
-		<span class="pun">}</span>
-	<span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>练习 4.5： 写一个函数在原地完成消除[]string中相邻重复的字符串的操作。</p>
-
-<pre><span class="kwd">func</span> <span class="pln">noRepeatSide</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span> <span class="pun">{</span>
-	<span class="pln">count</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span>
-	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">s</span> <span class="pun">{</span>
-		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
-			<span class="kwd">return</span> <span class="pln">s</span>
-		<span class="pun">}</span>
-		<span class="kwd">if</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">]</span> <span class="pun">{</span>
-			<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">s</span><span class="pun">[</span><span class="pun">:</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">:</span><span class="pun">]</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">)</span>
-			<span class="pln">count</span><span class="pun">-</span><span class="pun">-</span>
-		<span class="pun">}</span>
-	<span class="pun">}</span>
-	<span class="kwd">return</span> <span class="pln">s</span>
-<span class="pun">}</span>
-</pre>
-
-<h4>Map</h4>
-
-<p>虽然浮点数类型也是支持相等运算符比较的，但是将浮点数用做key类型则是一个坏的想法，正如第三章提到的，最坏的情况是可能出现的NaN和任何浮点数都不相等。对于V对应的value数据类型则没有任何的限制.
-map中的元素并不是一个变量，因此我们不能对map的元素进行取址操作.
-map上的大部分操作，包括查找、删除、len和range循环都可以安全工作在nil值的map上，它们的行为和一个空的map类似。但是向一个nil值的map存入元素将导致一个panic异常.在向map存数据前必须先创建map。
-和slice一样，map之间也不能进行相等比较；唯一的例外是和nil进行比较。要判断两个map是否包含相同的key和value，我们必须通过一个循环实现.
-如果结构体的全部成员都是可以比较的，那么结构体也是可以比较的，那样的话两个结构体将可以使用==或!=运算符进行比较.
-Go语言有一个特性让我们只声明一个成员对应的数据类型而不指名成员的名字；这类成员就叫匿名成员。匿名成员的数据类型必须是命名的类型或指向一个命名的类型的指针。下面的代码中，Circle和Wheel各自都有一个匿名成员。我们可以说Point类型被嵌入到了Circle结构体，同时Circle类型被嵌入到了Wheel结构体。</p>
-
-<pre><span class="kwd">type</span> <span class="typ">Circle</span> <span class="kwd">struct</span> <span class="pun">{</span>
-<span class="typ">Point</span>
-<span class="typ">Radius</span> <span class="kwd">int</span>
-<span class="pun">}</span>
-<span class="kwd">type</span> <span class="typ">Wheel</span> <span class="kwd">struct</span> <span class="pun">{</span>
-<span class="typ">Circle</span>
-<span class="typ">Spokes</span> <span class="kwd">int</span>
-<span class="pun">}</span>
-</pre>
-
-<p>得益于匿名嵌入的特性，我们可以直接访问叶子属性而不需要给出完整的路径：</p>
-
-<pre><span class="kwd">var</span> <span class="pln">w</span> <span class="typ">Wheel</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">X</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.X = 8</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Y</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.Y = 8</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Radius</span> <span class="pun">=</span> <span class="dec">5</span> <span class="com">// equivalent to w.Circle.Radius = 5</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Spokes</span> <span class="pun">=</span> <span class="dec">20</span>
-</pre>
-
-<p>为什么要嵌入一个没有任何子成员类型的匿名成员类型呢？答案是<code>匿名类型的方法集</code>。简短的点运算符语法可以用于选择匿名成员嵌套的成员，<strong>也可以用于访问它们的方法</strong>。实际上，外层的结构体不仅仅是获得了匿名成员类型的所有成员，而且也获得了该类型导出的全部的方法。这个机制可以用于将一个有简单行为的对象组合成有复杂行为的对象。<strong>组合</strong>是Go语言中面向对象编程的核心.</p>
-
-                </div>
-                <a class="ui large button" href="/2016/12/07/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%881%ef%bc%89">Read More</a>
-                <h4 class="ui horizontal header divider">
-                    <a href="#">这是分界线哦~~</a>
-                </h4>
-                
                 <h3 class="ui header">Error handling and Go (翻译)</h3>
                 <div class="postContent">
-                    <p>本篇文章来自《The Go Blog》。文章地址为<a href="https://blog.golang.org/error-handling-and-go">https://blog.golang.org/error-handling-and-go</a>
+                    <hr />
+
+<p>本篇文章来自《The Go Blog》。文章地址为<a href="https://blog.golang.org/error-handling-and-go">https://blog.golang.org/error-handling-and-go</a>
 下面是在下的翻译。因为看英文看完就忘，所以翻译翻译，聊以自慰。</p>
 
 <h2>错误处理和Go</h2>
@@ -386,249 +219,19 @@ Go语言有一个特性让我们只声明一个成员对应的数据类型而不
 
 <p>如果你写过Go的代码，你可能已经遇到了内置的error类型。Go的代码使用error表示异常状态。例如os.Open函数打开文件失败的时候，返回一个不为nil的error值。</p>
 
-<pre><span class="kwd">func</span> <span class="typ">Open</span><span class="pun">(</span><span class="pln">name</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">(</span><span class="pln">file</span> <span class="pun">*</span><span class="typ">File</span><span class="pun">,</span> <span class="pln">err</span> <span class="pln">error</span><span class="pun">)</span>
-</pre>
+<pre><code class="language-golang">func Open(name string) (file *File, err error)
+</code></pre>
 
 <p>下面的代码使用os.Open打开一个文件。如果出现一个error,它会调用log.Fatal来打印出错误结束。</p>
 
-<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="str">&#34;filename.ext&#34;</span><span class="pun">)</span>
-<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
-<span class="pun">}</span>
-<span class="com">// do something with the open *File f</span>
-</pre>
+<pre><code class="language-golang">f, err := os.Open(&quot;filename.ext&quot;)
+if err != nil {
+    log.Fatal(err)
+}
+// do something with the open *File f
+</code></pre>
 
-<p>在Go中，你仅需要知道这些关于error类型的知识，就能做很多事情了，但是在这篇文章中我们将仔细研究error，并讨论在Go中的一些好的错误处理的实例
-<!-- more --></p>
-
-<h3>error 类型</h3>
-
-<p>error类型是一个接口(interface)类型。一个error变量代表任意一个能将自己描绘成字符串的值。
-这个是接口的定义</p>
-
-<pre><span class="kwd">type</span> <span class="pln">error</span> <span class="kwd">interface</span> <span class="pun">{</span>
-    <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span>
-<span class="pun">}</span>
-</pre>
-
-<p>error类型如同其他所有内置类型是在universe block(<a href="https://golang.org/ref/spec#Blocks">The universe block encompasses all Go source text.</a>)中预声明（<a href="https://golang.org/ref/spec#Predeclared_identifiers">predeclare</a>）的。
-最常使用的error实例是error包中未导出（export）的errorString类型。</p>
-
-<pre><span class="com">// errorString is a trivial implementation of error.</span>
-<span class="kwd">type</span> <span class="pln">errorString</span> <span class="kwd">struct</span> <span class="pun">{</span>
-    <span class="pln">s</span> <span class="pln">string</span>
-<span class="pun">}</span>
-
-<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="pln">errorString</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
-    <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">s</span>
-<span class="pun">}</span>
-</pre>
-
-<p>你可以使用errors.New函数来构建一个这样的值。它接受一个字符串，将之转成errors.errorString，并返回error值</p>
-
-<pre><span class="com">// New returns an error that formats as the given text.</span>
-<span class="kwd">func</span> <span class="typ">New</span><span class="pun">(</span><span class="pln">text</span> <span class="pln">string</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
-    <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">errorString</span><span class="pun">{</span><span class="pln">text</span><span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>这是你可能会使用的errors.New的情况：</p>
-
-<pre><span class="kwd">func</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pln">f</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="pun">(</span><span class="kwd">float64</span><span class="pun">,</span> <span class="pln">error</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
-        <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">errors</span><span class="pun">.</span><span class="typ">New</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number&#34;</span><span class="pun">)</span>
-    <span class="pun">}</span>
-    <span class="com">// implementation</span>
-<span class="pun">}</span>
-</pre>
-
-<p>使用一个负数参数来调用Sqrt，会得到一个非nil的error值（具体的表示是一个errors.errorString值）。调用者能通过<code>error</code>类型的Error方法获取错误字符串(“math: square root of…“)，或者就直接输出它：</p>
-
-<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pun">-</span><span class="dec">1</span><span class="pun">)</span>
-<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<p>fmt包通过调用它的Error()方法格式化error类型的值。
-这个是错误的实现总结上下文的方法。错误应该由os.Open格式化返回为”open /etc/passwd: permission denied,” ,而不仅仅是”permission denied.“由Sqrt返回的错误缺少了关于无效参数的信息。
-在fmt包中有个有用的函数Errorf,用于增加这个信息。它根据 <code>Printf</code>规则来格式化字符串，并返回一个由errors.New创建的error类型。</p>
-
-<pre><span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
-    <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<p>在许多情况下fmt.Errorf已经足够 ，但是既然error是一个interface，你可以使用任意的数据结构作为error，让调用者来检查错误的详细信息。
-举个例子，我们假想的调用也许想重新使用这个无效参数来调用Sqrt。我们能通过定义一个新的error的实现完成这个目标，而不是使用errors.errorString：</p>
-
-<pre><span class="kwd">type</span> <span class="typ">NegativeSqrtError</span> <span class="kwd">float64</span>
-
-<span class="kwd">func</span> <span class="pun">(</span><span class="pln">f</span> <span class="typ">NegativeSqrtError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
-    <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="kwd">float64</span><span class="pun">(</span><span class="pln">f</span><span class="pun">)</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<p>复杂的调用可以使用类型断言（<a href="https://golang.org/ref/spec#Type_assertions">type assertion</a>）来检查NegativeSqrtError并特别处理，当调用者将error传递给fmt.Println或者log.Fatal的时候，不会有任何行为上的变化。
-再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中�任何行为上的变化。
-再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中指定的SyntaxError类型。</p>
-
-<pre><span class="kwd">type</span> <span class="typ">SyntaxError</span> <span class="kwd">struct</span> <span class="pun">{</span>
-    <span class="pln">msg</span>    <span class="pln">string</span> <span class="com">// description of error</span>
-    <span class="typ">Offset</span> <span class="kwd">int64</span>  <span class="com">// error occurred after reading Offset bytes</span>
-<span class="pun">}</span>
-
-<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="typ">SyntaxError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">msg</span> <span class="pun">}</span>
-</pre>
-
-<p>Offset字段甚至不会在error默认的格式化中出现，但是调用者可以使用它，添加文件和行信息到到error消息中。</p>
-
-<pre><span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dec</span><span class="pun">.</span><span class="typ">Decode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">val</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-    <span class="kwd">if</span> <span class="pln">serr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pun">*</span><span class="pln">json</span><span class="pun">.</span><span class="typ">SyntaxError</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">{</span>
-        <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">findLine</span><span class="pun">(</span><span class="pln">f</span><span class="pun">,</span> <span class="pln">serr</span><span class="pun">.</span><span class="typ">Offset</span><span class="pun">)</span>
-        <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%s:%d:%d: %v&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">.</span><span class="typ">Name</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
-    <span class="pun">}</span>
-    <span class="kwd">return</span> <span class="pln">err</span>
-<span class="pun">}</span>
-</pre>
-
-<p>（这是来自Camlistore项目的真实代码的省略的简化版本）
-error接口仅仅需要Error方法；特殊的error实现可能需要其他的方法。例如，net包中返回error类型的错误，遵循了通常的惯例，但是一些error的实现通过net.Error接口定义了其他方法：</p>
-
-<pre><span class="kwd">package</span> <span class="pln">net</span>
-
-<span class="kwd">type</span> <span class="typ">Error</span> <span class="kwd">interface</span> <span class="pun">{</span>
-    <span class="pln">error</span>
-    <span class="typ">Timeout</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span>   <span class="com">// Is the error a timeout?</span>
-    <span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span> <span class="com">// Is the error temporary?</span>
-<span class="pun">}</span>
-</pre>
-
-<p>客户端代码可以使用类型断言（type assertion）来测试，然后从永久性错误中区分短暂的的网络错误。例如，一个网络爬虫也许会休眠并重试当它遇到一个零时性错误并放弃其他的。</p>
-
-<pre><span class="kwd">if</span> <span class="pln">nerr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pln">net</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">&amp;</span><span class="pun">&amp;</span> <span class="pln">nerr</span><span class="pun">.</span><span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">time</span><span class="pun">.</span><span class="typ">Sleep</span><span class="pun">(</span><span class="dec">1e9</span><span class="pun">)</span>
-    <span class="kwd">continue</span>
-<span class="pun">}</span>
-<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<h3>简化重复的错误处理</h3>
-
-<p>在Go中，错误处理非常重要。语言的设计和约定鼓励你在发生错误的时候明确检查错误（和其他语言使用抛出错误并获取错误（ throwing exceptions and sometimes catching them ）的惯例不一样）。在有些情况下，这使你的Go代码冗余，但是幸运的是，你可以使用一些技巧来最少的重复错误处理。
-思考一个使用HTTP处理器的App Engine应用，从数据库中检索一条记录并使用模板格式化。</p>
-
-<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">http</span><span class="pun">.</span><span class="typ">HandleFunc</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">viewRecord</span><span class="pun">)</span>
-<span class="pun">}</span>
-
-<span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
-    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
-    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
-        <span class="kwd">return</span>
-    <span class="pun">}</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
-    <span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>这个函数处理由datastore.Get函数和<code>viewTemplate</code>的Execute方法产生的错误。在这两个错误中，它用HTTP状态码500(“Internal Server Error”)来向用户展现一个简单的错误信息。这段代码看起来是可管理的，但是添加了多余的HTTP处理器，并以许多相同的错误处理代码结束。
-为了减少重复，我们可以定义我们自己的HTTP appHandler类型来包含error并返回值。</p>
-
-<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span>
-</pre>
-
-<p>然后，我们修改我们的viewRecord 函数来返回错误：</p>
-
-<pre><span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
-    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
-    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
-    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="kwd">return</span> <span class="pln">err</span>
-    <span class="pun">}</span>
-    <span class="kwd">return</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<p>这和原始的版本相似，但是http包不能理解返回error的函数。为了修正，我们在appHandler上实现了http.Handler接口的ServeHTTP方法：</p>
-
-<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
-    <span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>ServeHTTP方法调用appHandler函数并且向用户显示错误（如果有的话）。注意这个方法的接收者，fn，是一个函数。（Go可以这样做！）方法调用函数通过调用表达式fn(w, r)中的接收者。
-现在，当使用http包注册viewRecord的时候，我们使用Handle函数（而不是HandleFunc）appHandler作为http.Handler（而不是http.HandlerFunc）</p>
-
-<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">http</span><span class="pun">.</span><span class="typ">Handle</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">appHandler</span><span class="pun">(</span><span class="pln">viewRecord</span><span class="pun">)</span><span class="pun">)</span>
-<span class="pun">}</span>
-</pre>
-
-<p>通过基本架构中的错误处理，我们可以使它更加的用户友好。相比仅仅展示错误的字符串，更好的方法是给用户简单的错误消息并附加适合的HTTP状态码，同时在App Engine开发者控制台记录完整的错误用于调试。
-为了做到这点，我们创建一个appError 结构体，包含一个error类型和一些其他字段</p>
-
-<pre><span class="kwd">type</span> <span class="pln">appError</span> <span class="kwd">struct</span> <span class="pun">{</span>
-    <span class="typ">Error</span>   <span class="pln">error</span>
-    <span class="typ">Message</span> <span class="pln">string</span>
-    <span class="typ">Code</span>    <span class="kwd">int</span>
-<span class="pun">}</span>
-</pre>
-
-<p>接下来，我们修改appHandler类型以便返回*appError值：</p>
-
-<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span>
-</pre>
-
-<p>（通常，不使用error，而是使用具体的error类型进行传递的做法是错误的，原因会在<a href="https://golang.org/doc/faq#nil_error">Go FAQ</a>中讨论，不过在这里是正确的，因为ServeHTTP是唯一看到这个值并且使用其内容的地方。）
- 为了使<code>appHandler</code>的ServeHTTP方法向用户显示<code>appError</code>的消息和正确的HTTP状态码，并向开发者记录完整的Error：</p>
-
-<pre> <span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="kwd">if</span> <span class="pln">e</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">e</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span> <span class="com">// e is *appError, not os.Error.</span>
-        <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
-        <span class="pln">c</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%v&#34;</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span>
-        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Message</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Code</span><span class="pun">)</span>
-    <span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>最后，我们更新viewRecord函数，并使它遇到错误的时候返回更多的上下文：</p>
-
-<pre> <span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span> <span class="pun">{</span>
-    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
-    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
-    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Record not found&#34;</span><span class="pun">,</span> <span class="dec">404</span><span class="pun">}</span>
-    <span class="pun">}</span>
-    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
-        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Can&#39;t display record&#34;</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">}</span>
-    <span class="pun">}</span>
-    <span class="kwd">return</span> <span class="kwd">nil</span>
-<span class="pun">}</span>
-</pre>
-
-<p>这个版本的viewRecord和原始版本的程度相同，但是现在每一行都有特别的意思，并且，我们提供更加友好的用户体验。
- 这还没结束；我们将会在我们的应用中优化错误处理。一些想法：
- - 给予每个错误处理一个漂亮的HTML模板
- - 当用户是管理员时，将stack trace写到HTTP回应中，使debug更加简单
- - 为appError写一个构建函数，用于存储stack trace，以便调试
- - 在appHandler中发生panic时recover，将错误作为“危险”写入开发者控制台，并用户“发生了一个严重的错误”。 这是避免向用户暴露由于编程错误引起的不可预测的错误的信息的一个很好的想法。参看<a href="http://golang.org/doc/articles/defer_panic_recover.html">Defer, Panic, and Recover</a> 文章获取更多细节。</p>
-
-<h3>总结</h3>
-
-<p>适合的错误处理是一个好的软件的基本需求。根据本文所讨论的技术，你应该能够写出更可靠且更简洁的Go代码</p>
-
-<p>Andrew Gerrand 著</p>
+<p>在Go中，你仅需要知道这些关于error类型的知识，就能做很多事情了，但是在这篇文章中我们将仔细研究error，并讨论在Go中的一些好的错误处理的实例</p>
 
                 </div>
                 <a class="ui large button" href="/2016/12/05/Error%20handling%20and%20Go%20%28%e7%bf%bb%e8%af%91%29">Read More</a>
@@ -638,72 +241,12 @@ error接口仅仅需要Error方法；特殊的error实现可能需要其他的�
                 
                 <h3 class="ui header">我的Redis初次实战</h3>
                 <div class="postContent">
-                    <p>因为各种原因，我必须在windows上进行服务器开发，所以我需要在windows上运行redis，即使《redis in action》上明确写着不推荐在windows上使用redis。
+                    <hr />
+
+<p>因为各种原因，我必须在windows上进行服务器开发，所以我需要在windows上运行redis，即使《redis in action》上明确写着不推荐在windows上使用redis。
 我在windows上使用的redis是从 <a href="https://github.com/dmajkic/redis/downloads">https://github.com/dmajkic/redis/downloads</a> 获取的。
 我使用redis的桌面客户端为Redis Desktop Manager。使用的原因仅仅是第一个搜到的客户端就是他且没有让我讨厌的地方，就继续用了。软件地址<a href="https://redisdesktop.com/download。">https://redisdesktop.com/download。</a>
-极力推荐《redis实战》。从第一章开始，在介绍什么是redis，有什么用，与其他数据库有什么区别之后，就开始从一个项目开始，演示如何使用redis。讲的第一个项目是对文章进行投票，这让我的回忆起我的大学的第一个项目–一个投票系统的实现。
-<!-- more -->
-在看完这一章之后，我对redis有了个初步了解，并将在这一章学到的知识，运用到我的实际工作的一个小项目中：解析短信回执的xml，统计回执中的信息，统计用户的某个活动发送的短信各种状态的数目。解析后的xml数据大致如下</p>
-
-<pre><span class="kwd">type</span> <span class="typ">Message</span> <span class="kwd">struct</span> <span class="pun">{</span>
-    <span class="typ">PhoneNum</span>   <span class="pln">string</span>
-    <span class="typ">State</span>      <span class="pln">string</span>
-    <span class="typ">UserID</span>     <span class="kwd">int</span>
-    <span class="typ">ActivityID</span> <span class="kwd">int</span>
-<span class="pun">}</span>
-</pre>
-
-<p>本项目是解析一个xml文件，得到其中的信息，进行统计，返回统计的结果。本来可以将数据使用Map存储在内存中，等所有的信息统计后，将Map中的信息输出就可以了，但是这个项目以后要扩展成，需要将内存的数据进行持久化处理，定时过期数据和多服务器主从同步数据，所以使用redis无疑是最好的选择。
-我仿造《redis实战》第一章的编程方法，对程序进行了改造。设定了：
-- user集合： 存储接收到的xml中用户id的集合。集合内的元素类似{1,2,3}
-- user_x_acitvity: 存储用户ID为x的活动id的集合，user_1_acitvity集合内的元素类似{1,2,3}
-- user_x_acitvity_y: 存储用户ID为x，活动ID为y的手机号码信息。user_1_acitvity_1集合内的元素类似{“15952010343，DELIVRD”}，元素的值为”phoneNum,status”的组合
-通过user集合找到有哪些用户收到了回执，通过user_x_acitvity记录用户的哪些活动在回执的记录中。并通过user_x_acitvity_y找到属于此活动的手机号码的状态。看完《redis实战》第一章最大的收获就是设定set的名字。可以通过设定set以特定的名字，来索引到特定的信息。
-具体的程序代码在：<a href="https://github.com/qwendy/handleFeedback">https://github.com/qwendy/handleFeedback</a></p>
-
-<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">rc</span> <span class="pun">*</span><span class="pln">redisContainer</span><span class="pun">)</span> <span class="pln">pushYiMeiXMLData</span><span class="pun">(</span><span class="pln">message</span> <span class="typ">YiMeiMessage</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">activityID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">Seqid</span> <span class="pun">&gt;</span><span class="pun">&gt;</span> <span class="dec">16</span>
-    <span class="pln">userID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">Seqid</span> <span class="pun">-</span> <span class="pun">(</span><span class="pln">activityID</span> <span class="pun">&lt;</span><span class="pun">&lt;</span> <span class="dec">16</span><span class="pun">)</span>
-    <span class="com">// 用户的集合。设置接收到的用户的集合</span>
-    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="str">&#34;user&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
-    <span class="com">// 设置某个用户的活动集合</span>
-    <span class="pln">userActivitySet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user:%d&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
-    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="pln">userActivitySet</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
-    <span class="com">// 活动的手机号码状态集合</span>
-    <span class="pln">activityPhoneSet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user_%d_activity_%d&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
-    <span class="com">// 手机号码和状态</span>
-    <span class="pln">phoneStatus</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;%s,%s&#34;</span><span class="pun">,</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">PhoneNum</span><span class="pun">,</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">State</span><span class="pun">)</span>
-    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="pln">activityPhoneSet</span><span class="pun">,</span> <span class="pln">phoneStatus</span><span class="pun">)</span>
-<span class="pun">}</span>
-
-<span class="kwd">func</span> <span class="pun">(</span><span class="pln">rc</span> <span class="pun">*</span><span class="pln">redisContainer</span><span class="pun">)</span> <span class="typ">Print</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">userID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="str">&#34;user&#34;</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-        <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;user:%s \n&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
-        <span class="pln">userActivitySet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user:%s&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
-        <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">activityID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="pln">userActivitySet</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;activityID:%s  \n&#34;</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
-            <span class="pln">activityPhoneSet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user_%s_activity_%s&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
-            <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">phoneStatus</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="pln">activityPhoneSet</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-                <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;phoneStatus:%s  &#34;</span><span class="pun">,</span> <span class="pln">phoneStatus</span><span class="pun">)</span>
-            <span class="pun">}</span>
-            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;\n&#34;</span><span class="pun">)</span>
-        <span class="pun">}</span>
-
-    <span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
-
-<p>Val() {
-                fmt.Printf(“phoneStatus:%s  “, phoneStatus)
-            }
-            fmt.Printf(”\n”)
-        }</p>
-
-<pre><code>}
-</code></pre>
-
-<p>}
-```</p>
+极力推荐《redis实战》。从第一章开始，在介绍什么是redis，有什么用，与其他数据库有什么区别之后，就开始从一个项目开始，演示如何使用redis。讲的第一个项目是对文章进行投票，这让我的回忆起我的大学的第一个项目&ndash;一个投票系统的实现。</p>
 
                 </div>
                 <a class="ui large button" href="/2016/09/03/%e6%88%91%e7%9a%84Redis%e5%88%9d%e6%ac%a1%e5%ae%9e%e6%88%98">Read More</a>

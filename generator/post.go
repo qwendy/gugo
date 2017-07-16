@@ -20,17 +20,20 @@ import (
 type Post struct {
 	SourcePath   string
 	sourceData   []byte
+	overviewData []byte
 	Destination  string // the folder to create directory and html file
 	Location     string // the location(directory) of the html file
 	htmlData     []byte
+	overViewHtml []byte
 	Meta         *Meta
 	Template     *template.Template
 	TemplateData *PostTemplateData
 }
 
 type PostTemplateData struct {
-	Meta    *Meta
-	Content template.HTML
+	Meta     *Meta
+	Overview template.HTML
+	Content  template.HTML
 }
 type Meta struct {
 	Title      string
@@ -76,31 +79,49 @@ func (p *Post) Fetch() error {
 }
 
 // parse the metedata from markdown file and remove it from sourcefile
+// parse overview data
 func (p *Post) ParseMetaData() (err error) {
 	buf := bufio.NewReader(bytes.NewReader(p.sourceData))
 	metaData := []byte{}
-	ok := false
-	finished := false
+	overview := []byte{}
+	content := []byte{}
+	metaStart := false
+	metaFinished := false
+	overviewFinished := false
 	// get the data between the line only have "---"
-	for !finished {
+	for true {
 		line, isPrefix, lineErr := buf.ReadLine()
 		if lineErr != nil {
 			break
 		}
-		if string(line) == "---" {
-			if ok == true {
-				finished = true
+		for _, s := range []string{"---", "--- ", " --- ", " ---", "----"} {
+			if string(line) == s {
+				if metaStart == true {
+					metaFinished = true
+				}
+				metaStart = true
 			}
-			ok = true
 		}
-		if ok {
-			if !isPrefix {
-				line = append(line, []byte("\n")...)
+		for _, s := range []string{"<!-- more -->", "<!-- more-->", "<!--more -->"} {
+			if strings.Contains(string(line), s) {
+				overviewFinished = true
 			}
+		}
+
+		if !isPrefix {
+			line = append(line, []byte("\n")...)
+		}
+		if metaStart && !metaFinished {
 			metaData = append(metaData, line...)
 		}
+		if metaFinished && !overviewFinished {
+			overview = append(overview, line...)
+		}
+		if metaFinished {
+			content = append(content, line...)
+		}
 	}
-	if !ok || !finished {
+	if !metaFinished {
 		return fmt.Errorf("Cannot find the metadata of the post!")
 	}
 	err = yaml.Unmarshal(metaData, p.Meta)
@@ -113,17 +134,24 @@ func (p *Post) ParseMetaData() (err error) {
 	if p.Meta.Date == "" {
 		return fmt.Errorf("The Date of the post is empty!")
 	}
-	_, err = buf.Read(p.sourceData)
+	p.sourceData = content
+	p.overviewData = overview
 	return
 }
 
 // convert mardown file data to html
 func (p *Post) Convert() (err error) {
 	p.htmlData = blackfriday.MarkdownCommon(p.sourceData)
-	err = p.fixHtmlData()
+	err = p.fixHtmlData(p.htmlData)
 	if err != nil {
 		return err
 	}
+	p.overViewHtml = blackfriday.MarkdownCommon(p.overviewData)
+	err = p.fixHtmlData(p.overViewHtml)
+	if err != nil {
+		return err
+	}
+
 	return
 }
 
@@ -154,8 +182,9 @@ func (p *Post) Generate() (err error) {
 	defer f.Close()
 	writer := bufio.NewWriter(f)
 	p.TemplateData = &PostTemplateData{
-		Meta:    p.Meta,
-		Content: template.HTML(string(p.htmlData)),
+		Meta:     p.Meta,
+		Content:  template.HTML(string(p.htmlData)),
+		Overview: template.HTML(string(p.overViewHtml)),
 	}
 	if err := p.Template.Execute(writer, p.TemplateData); err != nil {
 		return fmt.Errorf("Executing template Error: %v", err)
@@ -168,8 +197,8 @@ func (p *Post) Generate() (err error) {
 
 // replace code in html file,use syntaxhighlight code
 // remove some html tags such as <head>
-func (p *Post) fixHtmlData() (err error) {
-	reader := bytes.NewReader(p.htmlData)
+func (p *Post) fixHtmlData(data []byte) (err error) {
+	reader := bytes.NewReader(data)
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
 		return fmt.Errorf("Creating NewDocumentFromReader Err:%v", err)
@@ -187,6 +216,6 @@ func (p *Post) fixHtmlData() (err error) {
 	for _, tag := range []string{"<html>", "</html>", "<head>", "</head>", "<body>", "</body>"} {
 		newDoc = strings.Replace(newDoc, tag, "", 1)
 	}
-	p.htmlData = []byte(newDoc)
+	data = []byte(newDoc)
 	return
 }

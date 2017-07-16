@@ -19,7 +19,7 @@ windows系统。mongo3.2版本
 
 .\bin\mongod.exe --port 27101 --dbpath=.\mongos\s1 --logpath=.\mongos\log\s1.log --logappend --journal --storageEngine=mmapv1 --shardsvr
 ```
-
+<!-- more -->
 步骤二： 启动Config Server
 ```
 .\bin\mongod.exe --port 27200 --dbpath=.\mongos\config --logpath=.\mongos\log\config.log --logappend --journal --storageEngine=mmapv1 --configsvr

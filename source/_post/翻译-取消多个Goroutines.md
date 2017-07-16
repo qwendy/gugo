@@ -32,7 +32,7 @@ The way we’re going decide when to quit is by listening for a C-c keypress. Of
 
 Let’s get started.
 让我们开始吧
-
+<!-- more -->
 ## A Main without Tidying up
 ``` go
 package main

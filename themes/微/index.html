@@ -153,7 +153,7 @@
             <div class="right item">
                 <div class="ui animated fade button" tabindex="0">
                     <div class="visible content">赋此间一抹丹砂</div>
-                    <div class="hidden content"><a href="">清狂</a></div>
+                    <div class="hidden content"><a href="">回到顶端</a></div>
                 </div>
             </div>
         </div>
@@ -206,7 +206,7 @@
                 {{ range $key,$post := .Posts}}
                 <h3 class="ui header">{{$post.TemplateData.Meta.Title}}</h3>
                 <div class="postContent">
-                    {{$post.TemplateData.Content}}
+                    {{$post.TemplateData.Overview}}
                 </div>
                 <a class="ui large button" href="/{{$post.Location}}">Read More</a>
                 <h4 class="ui horizontal header divider">

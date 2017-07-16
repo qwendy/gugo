@@ -22,7 +22,7 @@ Why is this cool? Well, for one it’s a lot easier to host a static site and it
 In this post, I will describe the static blog generator I wrote in Go, which powers this blog.
 
 在本文中，我将描述我使用Go编写的静态博客生成器，它为这个博客提供了强大的功能。
-
+<!-- more -->
 ## Motivation 动机
 
 You might be familiar with static-site-generators like the great Hugo, which has just about all the features one could hope for in regards to static site generation.

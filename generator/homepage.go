@@ -123,6 +123,9 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 		prePageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, page-1)
 		curPageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, page)
 	}
+	if page == 2 {
+		prePageUrl = "/"
+	}
 	if page == allPageNum {
 		max = len(hp.Posts)
 		nextPageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, allPageNum)
@@ -137,7 +140,7 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 	for index := page; index-page < hp.PageNumShowCount && index <= allPageNum; index++ {
 		pds = append(pds, PageData{
 			Num: index,
-			Url: fmt.Sprintf("page/%v", index),
+			Url: fmt.Sprintf("/page/%v", index),
 		})
 	}
 	tplData = HomePageTemplateData{

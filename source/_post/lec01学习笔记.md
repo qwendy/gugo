@@ -19,7 +19,7 @@ MapReduce： 定义Map和Reduce函数，输入数组形式的数据。
 
 MapReduce由Mater和Worker组成。Master给workers分配工作，决定worker运行map方法还是reduce方法。当worker执行错误，直接重启worker就好。
 master的调度程序
-
+<!-- more -->
 ``` go
 func (mr *Master) schedule(phase jobPhase) {
 	var ntasks int
