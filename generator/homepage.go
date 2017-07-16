@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"sort"
 
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -85,6 +86,7 @@ func (hp *HomePage) GetPosts() error {
 		}
 		hp.Posts = append(hp.Posts, *p)
 	}
+	hp.sortPosts()
 	return nil
 }
 
@@ -100,22 +102,38 @@ func (hp *HomePage) GeneratePages() {
 	}
 }
 
+func (hp *HomePage) sortPosts() {
+	sort.Slice(hp.Posts, func(i, j int) bool {
+		if hp.Posts[i].Meta.Date > hp.Posts[j].Meta.Date {
+			return true
+		}
+		return false
+	})
+}
+
 func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateData) {
 	lastUrl := fmt.Sprintf("page/%v", allPageNum)
-	max := hp.PageNumShowCount
+	min := 0
+	max := hp.NumPerPage * page
 	prePageUrl := ""
 	nextPageUrl := ""
 	curPageUrl := ""
 	if page != 1 {
+		min = hp.NumPerPage * (page - 1)
 		prePageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page-1)
 		nextPageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page+1)
 		curPageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page)
 	}
 	if page == allPageNum {
-		max = len(hp.Posts) - 1
+		max = len(hp.Posts)
 		nextPageUrl = fmt.Sprintf("page/%v", allPageNum)
 	}
-	p := hp.Posts[page:max]
+	p := hp.Posts[min:max]
+	log.Infof("page:%v,post:%v-%v", page, min, max)
+	fmt.Println(p[len(p)-1].TemplateData.Meta.Date)
+	for _, xxx := range p {
+		log.Infoln(xxx.Meta)
+	}
 	pds := []PageData{}
 	for index := page; index-page < hp.PageNumShowCount && index <= allPageNum; index++ {
 		pds = append(pds, PageData{
@@ -128,11 +146,11 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 		LastUrl:     lastUrl,
 		CurPage:     page,
 		AllPageNum:  allPageNum,
-		Posts:       p,
 		PrePageUrl:  prePageUrl,
 		CurPageUrl:  curPageUrl,
 		NextPageUrl: nextPageUrl,
 		PageData:    pds,
+		Posts:       p,
 	}
 	return
 }

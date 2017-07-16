@@ -178,10 +178,10 @@
                         <i class="sidebar icon"></i>
                     </a>
                     <div class="left item">
-                        <a class="ui inverted button">清 | 狂</a>
+                        <a class="ui inverted button" href="/">清 | 狂</a>
                     </div>
                     <div class="right item">
-                        <a class="active item">Home</a>
+                        <a class="active item" href="/">Home</a>
                         <a class="item">分类</a>
                         <a class="item">Tags</a>
                         <a class="item">关于我</a>
@@ -203,101 +203,6 @@
 
         <div class="ui vertical stripe segment">
             <div class="ui text container">
-                
-                <h3 class="ui header">mongo数据库sharding学习记录</h3>
-                <div class="postContent">
-                    <p>参考文章：<a href="http://www.runoob.com/mongodb/mongodb-sharding.html">http://www.runoob.com/mongodb/mongodb-sharding.html</a></p>
-
-<p>windows系统。mongo3.2版本</p>
-
-<p>建立目录s0,s1,log,config</p>
-
-<p>步骤一：启动Shard Server</p>
-
-<pre><code>.\bin\mongod.exe --port 27100 --dbpath=.\mongos\s0 --logpath=.\mongos\log\s0.log --logappend --journal --storageEngine=mmapv1 --shardsvr
-
-.\bin\mongod.exe --port 27101 --dbpath=.\mongos\s1 --logpath=.\mongos\log\s1.log --logappend --journal --storageEngine=mmapv1 --shardsvr
-</code></pre>
-
-<p>步骤二： 启动Config Server</p>
-
-<pre><code>.\bin\mongod.exe --port 27200 --dbpath=.\mongos\config --logpath=.\mongos\log\config.log --logappend --journal --storageEngine=mmapv1 --configsvr
-</code></pre>
-
-<p>步骤三： 启动Route Process</p>
-
-<pre><code>.\bin\mongos.exe --port 40000 --configdb localhost:27200  --logpath=.\mongos\log\router.log --chunkSize 1
-</code></pre>
-
-<p>注意:
-1. 我这里不加–configsvr就出现Surprised to discover that localhost:27200 does not believe it is a config server错误。
-2. chunkSize太大的话，会导致插入很多很多数据后才分片。一开始没注意，以为设置错误没有分片。。。chunkSize以M为单位。</p>
-
-<p>步骤四： 配置Sharding</p>
-
-<ul>
-<li><p>连接路由服务器</p>
-
-<pre><code>.\bin\mongo.exe admin --port 40000
-</code></pre></li>
-
-<li><p>设置分片服务器</p>
-
-<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
-db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
-db.runCommand({ addshard:&#34;127.0.0.1:40000&#34; })
-或者
-sh.addShard(&#34;127.0.0.1:27100&#34;)
-</code></pre></li>
-
-<li><p>设置要分片的数据库</p>
-
-<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
-或者：
-sh.enableSharding(&#34;qdgame&#34;)
-</code></pre></li>
-
-<li><p>关闭balancing</p>
-
-<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
-</code></pre></li>
-
-<li><p>设置分片collection的index</p>
-
-<pre><code>use qdgame
-db.backpack.ensureIndex({usrid:1,id:1})
-</code></pre></li>
-
-<li><p>设置要分片的collection</p>
-
-<pre><code>db.runCommand({ shardcollection: &#34;qdgame.backpack&#34;, key: { usrid:1, id:1}})
-或者
-sh.shardCollection(&#34;qdgame.backpack&#34;,{usrid:1, id:1})
-</code></pre></li>
-
-<li><p>开启balancing</p>
-
-<pre><code>sh.enableBalancing(&#34;qdgame.backpack&#34;)
-</code></pre></li>
-</ul>
-
-<p>注意：设置一定要在admin数据库下。
-e.backpack”,{usrid:1, id:1})</p>
-
-<pre><code>
-- 开启balancing
-</code></pre>
-
-<p>sh.enableBalancing(“qdgame.backpack”)
-```</p>
-
-<p>注意：设置一定要在admin数据库下。</p>
-
-                </div>
-                <a class="ui large button" href="/2016/12/09/mongo%e6%95%b0%e6%8d%ae%e5%ba%93sharding%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95">Read More</a>
-                <h4 class="ui horizontal header divider">
-                    <a href="#">这是分界线哦~~</a>
-                </h4>
                 
                 <h3 class="ui header">寒衫浮梦-歌词</h3>
                 <div class="postContent">
@@ -399,171 +304,675 @@ e.backpack”,{usrid:1, id:1})</p>
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">《Go语言圣经》学习小记（1）</h3>
+                <h3 class="ui header">（翻译）Sharding-mongo官方文档3.2版本</h3>
                 <div class="postContent">
-                    <p>记录《Go语言圣经》学习笔记。（实为划重点）</p>
+                    <p>此篇文章为mongo官方文档，版本为3.2. 地址为：<a href="https://docs.mongodb.com/v3.2/core/sharded-cluster-components/">https://docs.mongodb.com/v3.2/core/sharded-cluster-components/</a></p>
 
-<p>顺序通信进程 （ communicating sequential processes ，缩写为CSP）。在CSP中，程序是一组中间没有共享状态的平行运行的处理过程，它们之间使用管道进行通信和控制同步。
-Go语言的官方博客 <a href="https://blog.golang.org">https://blog.golang.org</a> 会不定期发布一些Go语言最好的实践文章，包括当前语言的发展状态、未来 的计划、会议报告和Go语言相关的各种会议的主题等信息（译注： <a href="http://talks.golang.org/">http://talks.golang.org/</a> 包含了 官方收录的各种报告的讲稿）。
-<!-- more --></p>
+<h1>分片（Sharding）</h1>
 
-<h3>第一章 入门</h3>
+<p>分片是一个在多个主机上分发数据的方法。 MongoDB用分片实现大数据集合和高吞入量操作。
+大数据量集合和高吞吐量操作应用数据库系统挑战单个服务器的容量。例如，高请求速率能耗尽CPU性能。工作集大小大于系统的RAM给磁盘驱动器的I / O性能施加压力
+有两种方法处理系统的增长：垂直扩展和水平扩展
+垂直扩展涉及扩大单个服务器的性能，例如使用更强大的CPU，添加更多RAM，或者增加存储空间。可用技术中的限制可能会限制单个机器的工作负载能力。另外，云服务提供商在可用的硬件配置上设置上限。所以，对于垂直扩展存在实际的最大值。
+水平扩展涉及将系统的数据集切分并通过多服务器加载，添加另外的服务器来扩大需要的容量。既然单个机器的整体速度和容量不高，那么每个机器处理整个工作量的一部分，可能提供比一个高速度高容量服务器更好的效果。扩展部署的容量仅需要根据需要添加额外的服务器，总体成本可能比单个机器的高端硬件低。
+MongoDb支持通过分片来进行水平扩展。</p>
 
-<p>对map进行range循环时，其迭代顺序是不确定的，从实践来看，很可能每次运行都会有不一样的结果（译注：这是Go语言的设计者有意为之的，因为其底层实现不保证插入顺序和遍历顺序一致，也希望程序员不要依赖遍历时的顺序，所以干脆直接在遍历的时候做了随机化处理，醉了。补充：好像说随机序可以防止某种类型的攻击，虽然不太明白，但是感觉还蛮厉害的），来避免程序员在业务中依赖遍历时的顺序。
-map是用make函数创建的数据结构的一个<strong>引用</strong>。当一个map被作为参数传递给一个函数时，函数接收到的是一份<strong>引用的拷贝</strong>，虽然本身并不是一个东西，但因为他们指向的是同一块数据对象（译注：类似于C++里的引用传递，实际上指针是另一个指针了，但内部存的值指向同一块内存），所以你在函数里对map里的值进行修改时，原始的map内的值也会改变。</p>
+<h2>分片集群</h2>
 
-<h3>第二章 程序结构</h3>
+<p>MongoDB的分片集群由以下组件组成：
+- 分片（shard）：每个分片包含被分片数据的子集。每个分片可以被部署成副本集
+- mongos:mogos扮演查询路由（query router）的角色，提供一个在客户端个分片集群之间的接口
+- config servers: 配置服务器存储元数据（metadata）并配置集群的设置。在MongoDB 3.4，配置服务器必须部署成副本集</p>
 
-<p>如果初始化表达式被省略，那么将用零值初始化该变量。 数值类型变量对应的零值是0，布尔类型变量对应的零值是false，字符串类型对应的零值是空字符串，接口或引用类型（包括slice、map、chan和函数）变量对应的零值是nil。数组或结构体等聚合类型对应的零值是每个元素或字段都是对应该类型的零值。
-var形式的声明语句往往是用于需要显式指定变量类型地方，或者因为变量稍后会被重新赋值而初始值无关紧要的地方。
-任何类型的指针的零值都是nil。。如果p != nil测试为真，那么p是指向某个有效变量。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
-每次调用new函数都是返回一个新的变量的地址，当然也可能有特殊情况：如果两个类型都是空的，也就是说类型的大小是0，例如struct{}和 [0]int,有可能有相同的地址（依赖具体的语言实现）（译注：请谨慎使用大小为0的类型，因为如果类型的大小为0的话，可能导致Go语言的自动垃圾回收器有不同的行为，具体请查看runtime.SetFinalizer函数相关文档）。</p>
+<p>下面这张图描述了在一个分片集群中的交互
+<img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.png" alt="Alt text"/></p>
 
-<h3>第三章 基础数据类型</h3>
+<p>MongoDB分片数据是collection级别的，在集群中分发collection数据</p>
 
-<p>一个字符串是一个不可改变的字节序列。内置的len函数可以返回一个字符串中的字节数目（不是rune字符数目），索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束。字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串：</p>
+<!-- more -->
 
-<pre><span class="pln">s</span> <span class="pun">:</span><span class="pun">=</span> <span class="str">&#34;left foot&#34;</span>
-<span class="pln">t</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">s</span>
-<span class="pln">s</span> <span class="pun">+</span><span class="pun">=</span> <span class="str">&#34;, right foot&#34;</span>
-</pre>
+<h2>Shard keys</h2>
 
-<p>这并不会导致原始的字符串值被改变，但是变量s将因为+=语句持有一个新的字符串值，但是t依然是包含原先的字符串值。
-Go语言的常量有个不同寻常之处。虽然一个常量可以有任意有一个确定的基础类型，例如int或float64，或者是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类�是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类型的数字常量提供比基础类型更高精度的算术运算。
-无类型的常量不仅可以提供更高的运算精度，而且可以直接用于更多的表达式而不需要显式的类型转换。
-例如math包中的Pi常量：</p>
+<p>为了分发collection中的document，MongoDB使用shard key来对collection进行分区。shard key包含存在于目标collection中的每个document中的不可变的一个字段或者多个字段。
+当分片一个collection的时候选择shard key。分片后不能修改选择的shard key。一个分片collection只有一个shard key。
+为了分片一个非空的collection，collection必须有一个由shard key开始的索引。对应空的collection，如果collection没有社和的索引来作为特殊的shard key。MongoDB创建一个索引。
+shard key的选择影响分片集群的性能，效率和课扩展性。拥有最佳的可能的硬件和基础设施的集群可以通过选择shard key来突破瓶颈。选择分片键及其后缀索引还可以影响集群可以使用的分片策略。</p>
 
-<pre>	<span class="typ">Pi</span>  <span class="pun">=</span> <span class="dec">3.14159265358979323846264338327950288419716939937510582097494459</span> <span class="com">//http://oeis.org/A000796</span>
-</pre>
+<h2>块（Chunks）</h2>
 
-<h3>第四章 符合数据类型</h3>
+<p>MongoDb将分片的数据分割成块（Chunks）。每一个Chunk都根据shard key包含上限和下限。
+MongoDB使用分片集群均衡器（sharded cluster balancer）来在分片集群中的shard中迁移块（chunks）。均衡器尝试在集群中的所有分片之间实现块（chunk）的平衡</p>
 
-<h4>数组</h4>
+<h2>分片的优势</h2>
 
-<p>在数组字面值中，如果在数组的长度位置出现的是“…”省略号，则表示数组的长度是根据初始化值的个数来计算。数组的长度必须是常量表达式，因为数组的长度需要在编译阶段确定。</p>
+<h3>读/写</h3>
 
-<pre><span class="pln">q</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">)</span> <span class="com">// &#34;[3]int&#34;</span>
-</pre>
+<p>MongoDB分发读写工作负载到分片集群中的分片服务器中（shard），允许每一个shard运行集群操作的子集。读和写工作负载都可以通过增加更多的shard来水平扩展。
+对于包含shard key或复合shard key的前缀的查询，mongos可以在特定的分片（shard）或分片集上定位查询。这些目标操作通常比向集群中的每个分片广播更有效。</p>
 
-<p>也可以指定一个索引和对应值列表的方式初始化，就像下面这样：</p>
+<h3>存储容量</h3>
 
-<pre><span class="kwd">type</span> <span class="typ">Currency</span> <span class="kwd">int</span>
+<p>在集群中的分片服务器（Shard）中分发共享数据，允许每一个shard包含集群中所有数据的子集。随着数据增长，额外的shards扩大了集群的存储容量。</p>
 
-<span class="kwd">const</span> <span class="pun">(</span>
-	<span class="typ">USD</span> <span class="typ">Currency</span> <span class="pun">=</span> <span class="pln">iota</span> <span class="com">// 美元</span>
-	<span class="typ">EUR</span>                 <span class="com">// 欧元</span>
-	<span class="typ">GBP</span>                 <span class="com">// 英镑</span>
-	<span class="typ">RMB</span>                 <span class="com">// 人民币</span>
-<span class="pun">)</span>
-<span class="pln">symbol</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="pln">string</span><span class="pun">{</span><span class="typ">USD</span><span class="pun">:</span> <span class="str">&#34;$&#34;</span><span class="pun">,</span> <span class="typ">EUR</span><span class="pun">:</span> <span class="str">&#34;€&#34;</span><span class="pun">,</span> <span class="typ">GBP</span><span class="pun">:</span> <span class="str">&#34;￡&#34;</span><span class="pun">,</span> <span class="typ">RMB</span><span class="pun">:</span> <span class="str">&#34;￥&#34;</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="typ">RMB</span><span class="pun">,</span> <span class="pln">symbol</span><span class="pun">[</span><span class="typ">RMB</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// &#34;3 ￥&#34;</span>
-</pre>
+<h3>高可用性</h3>
 
-<p>如果一个数组的元素类型是可以相互比较的，那么数组类型也是可以相互比较的，这时候我们可以直接通过==比较运算符来比较两个数组，只有当两个数组的所有元素都是相等的时候数组才是相等的。不相等比较运算符!=遵循同样的规则。(斩风注: 这里的比较仅指相等和不等。<strong>大于小于不包含在此类</strong>，<strong>数组长度类型必须相同</strong>)</p>
+<p>分片集群可以继续执行部分读/写操作，即使中所有数据的子集。随着数据增长，额外的shards扩大了集群的存储容量。</p>
 
-<pre><span class="pln">a</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">b</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">b</span><span class="pun">,</span> <span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">,</span> <span class="pln">b</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">)</span> <span class="com">// &#34;true false false&#34;</span>
-<span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">3</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">d</span><span class="pun">)</span> <span class="com">// compile error: cannot compare [2]int == [3]int</span>
-</pre>
+<h3>高可用性</h3>
 
-<h4>slice</h4>
+<p>分片集群可以继续执行部分读/写操作，即使一个或者更多的分片服务器（shards）不能使用。虽然在宕机的时间内无法访问在不可用分片服务器上的数据子集，但针对可用分片的读取或写入仍然可以成功。
+在生产环境中，应将单个碎片部署为副本集，从而提高冗余和可用性</p>
 
-<p>一个slice是一个轻量级的数据结构，提供了访问数组子序列（或者全部）元素的功能，而且slice的底层确实引用一个数组对象。一个slice由三个部分构成：指针、长度和容量。指针指向第一个slice元素对应的底层数组元素的地址，要注意的是slice的第一个元素并不一定就是数组的第一个元素。（斩风注：slice可能是数组的中间部分。）长度对应slice中元素的数目；长度不能超过容量，容量一般是从slice的开始位置到底层数据的结尾位置。内置的len和cap函数分别返回slice的长度和容量。
-复制一个slice只是对底层的数组创建了一个新的slice别名。
-和数组不同的是，slice之间不能比较，因此我们不能使用==操作符来判断两个slice是否含有全部相等元素。不过标准库提供了高度优化的bytes.Equal函数来判断两个字节型slice是否相等（[]byte），但是对于其他类型的slice，我们必须自己展开每个元素进行比较。
-一个零值的slice等于nil。一个nil值的slice并没有底层数组。一个nil值的slice的长度和容量都是0，但是也有非nil值的slice的长度和容量也是0的，例如[]int{}或make([]int, 3)[3:]。与任意类型的nil值一样，我们可以用[]int(nil)类型转换表达式来生成一个对应类型slice的nil值。</p>
+<h2>分片前的注意事项</h2>
 
-<pre><span class="kwd">var</span> <span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span>    <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">nil</span>        <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">(</span><span class="kwd">nil</span><span class="pun">)</span> <span class="com">// len(s) == 0, s == nil</span>
-<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="pun">}</span>    <span class="com">// len(s) == 0, s != nil</span>
-</pre>
+<p>分片式集群基础架构要求和复杂性需要仔细规划，执行和维护。
+仔细考虑选择shard key对于确保集群性能和效率是必要的。您不能在分片后更改分片键，也不能取消分片集合。
+如果查询不包括shard key或复合shard key的前缀，则mongos执行广播操作，查询分片群集中的所有分片。这些分散/聚集查询可能导致长时间运行操作。</p>
 
-<p>如果你需要测试一个slice是否是空的，使用len(s) == 0来判断，而不应该用s == nil来判断。
-内置的append函数可能使用比appendInt更复杂的内存扩展策略。因此，通常我们并不知道append调用是否导致了内存的重新分配，因此我们也不能确认新的slice和原始的slice是否引用的是相同的底层数组空间。同样，我们不能确认在原先的slice上的操作是否会影响到新的slice。因此，通常是将append返回的结果直接赋值给输入的slice变量。</p>
+<h2>分片的和未分片的集合</h2>
 
-<p>练习 4.3： 重写reverse函数，使用数组指针代替slice。</p>
+<p>数据库可以混合着分片和非分片集合。分片集合被分区并分布在集群中的分片上。未分片集合存储在主分片上。每个数据库都有自己的主分片。
+<img src="https://docs.mongodb.com/manual/_images/sharded-cluster-primary-shard.png" alt="Alt text"/></p>
 
-<pre><span class="kwd">func</span> <span class="pln">reverseV2</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">*</span><span class="pun">[</span><span class="dec">10</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
-	<span class="kwd">for</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">,</span> <span class="dec">9</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">j</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">=</span> <span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">,</span> <span class="pln">j</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
-		<span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span> <span class="pun">=</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
-	<span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
+<h2>连接分片集群</h2>
 
-<p>练习 4.4： 编写一个rotate函数，通过一次循环完成镟转。</p>
+<p>您必须连接到mongos路由器才能与分片集群中的任何集合进行交互。这包括分片和非分片集合。客户端不应该连接到单个分片以执行读取或写入操作。
+<img src="https://docs.mongodb.com/manual/_images/sharded-cluster-mixed.png" alt="Alt text"/></p>
 
-<pre><span class="kwd">func</span> <span class="pln">forwardRotate</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">,</span> <span class="pln">x</span> <span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
-	<span class="pln">mid</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">x</span>
-	<span class="pln">k</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">mid</span>
-	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
-		<span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span> <span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
-		<span class="pln">k</span><span class="pun">+</span><span class="pun">+</span>
-		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">mid</span> <span class="pun">{</span>
-			<span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
-				<span class="kwd">return</span>
-			<span class="pun">}</span>
-			<span class="pln">mid</span> <span class="pun">=</span> <span class="pln">k</span>
-		<span class="pun">}</span> <span class="kwd">else</span> <span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
-			<span class="pln">k</span> <span class="pun">=</span> <span class="pln">mid</span>
-		<span class="pun">}</span>
-	<span class="pun">}</span>
-<span class="pun">}</span>
-</pre>
+<p>你可以像连接到mongod一样连接到mongos，例如通过mongo shell或MongoDB驱动程序</p>
 
-<p>练习 4.5： 写一个函数在原地完成消除[]string中相邻重复的字符串的操作。</p>
+<h2>分片策略</h2>
 
-<pre><span class="kwd">func</span> <span class="pln">noRepeatSide</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span> <span class="pun">{</span>
-	<span class="pln">count</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span>
-	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">s</span> <span class="pun">{</span>
-		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
-			<span class="kwd">return</span> <span class="pln">s</span>
-		<span class="pun">}</span>
-		<span class="kwd">if</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">]</span> <span class="pun">{</span>
-			<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">s</span><span class="pun">[</span><span class="pun">:</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">:</span><span class="pun">]</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">)</span>
-			<span class="pln">count</span><span class="pun">-</span><span class="pun">-</span>
-		<span class="pun">}</span>
-	<span class="pun">}</span>
-	<span class="kwd">return</span> <span class="pln">s</span>
-<span class="pun">}</span>
-</pre>
+<p>MongoDB支持两种分片策略，用于在分片集群中分发数据。</p>
 
-<h4>Map</h4>
+<h3>散列分片（Hashed Sharding）</h3>
 
-<p>虽然浮点数类型也是支持相等运算符比较的，但是将浮点数用做key类型则是一个坏的想法，正如第三章提到的，最坏的情况是可能出现的NaN和任何浮点数都不相等。对于V对应的value数据类型则没有任何的限制.
-map中的元素并不是一个变量，因此我们不能对map的元素进行取址操作.
-map上的大部分操作，包括查找、删除、len和range循环都可以安全工作在nil值的map上，它们的行为和一个空的map类似。但是向一个nil值的map存入元素将导致一个panic异常.在向map存数据前必须先创建map。
-和slice一样，map之间也不能进行相等比较；唯一的例外是和nil进行比较。要判断两个map是否包含相同的key和value，我们必须通过一个循环实现.
-如果结构体的全部成员都是可以比较的，那么结构体也是可以比较的，那样的话两个结构体将可以使用==或!=运算符进行比较.
-Go语言有一个特性让我们只声明一个成员对应的数据类型而不指名成员的名字；这类成员就叫匿名成员。匿名成员的数据类型必须是命名的类型或指向一个命名的类型的指针。下面的代码中，Circle和Wheel各自都有一个匿名成员。我们可以说Point类型被嵌入到了Circle结构体，同时Circle类型被嵌入到了Wheel结构体。</p>
+<p>散列分片涉及计算分片键字段值的散列。然后根据散列分片键值为每个块分配一个范围。
+<img src="https://docs.mongodb.com/manual/_images/sharding-hash-based.png" alt="Alt text"/></p>
 
-<pre><span class="kwd">type</span> <span class="typ">Circle</span> <span class="kwd">struct</span> <span class="pun">{</span>
-<span class="typ">Point</span>
-<span class="typ">Radius</span> <span class="kwd">int</span>
-<span class="pun">}</span>
-<span class="kwd">type</span> <span class="typ">Wheel</span> <span class="kwd">struct</span> <span class="pun">{</span>
-<span class="typ">Circle</span>
-<span class="typ">Spokes</span> <span class="kwd">int</span>
-<span class="pun">}</span>
-</pre>
+<p>虽然分片键的范围“相近”，但是它们的散列值不可能在同一块上。 基于散列值的数据分布有助于更均匀的数据分布，特别是在碎片键单调变化的数据集中
+然而，散列分布意味着对分片键的基于范围的查询不太可能针对单个分片，导致更多的集群广播操作。</p>
 
-<p>得益于匿名嵌入的特性，我们可以直接访问叶子属性而不需要给出完整的路径：</p>
+<h3>范围分片（Ranged Sharding）</h3>
 
-<pre><span class="kwd">var</span> <span class="pln">w</span> <span class="typ">Wheel</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">X</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.X = 8</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Y</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.Y = 8</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Radius</span> <span class="pun">=</span> <span class="dec">5</span> <span class="com">// equivalent to w.Circle.Radius = 5</span>
-<span class="pln">w</span><span class="pun">.</span><span class="typ">Spokes</span> <span class="pun">=</span> <span class="dec">20</span>
-</pre>
+<p>远程分片涉及基于shard key将数据划分为范围。然后根据shard key为每个块（chunk）分配一个范围。
+<img src="https://docs.mongodb.com/manual/_images/sharding-range-based.png" alt="Alt text"/></p>
 
-<p>为什么要嵌入一个没有任何子成员类型的匿名成员类型呢？答案是<code>匿名类型的方法集</code>。简短的点运算符语法可以用于选择匿名成员嵌套的成员，<strong>也可以用于访问它们的方法</strong>。实际上，外层的结构体不仅仅是获得了匿名成员类型的所有成员，而且也获得了该类型导出的全部的方法。这个机制可以用于将一个有简单行为的对象组合成有复杂行为的对象。<strong>组合</strong>是Go语言中面向对象编程的核心.</p>
+<p>其值“相近”的分片键（shard key）的范围更可能驻留在同一块上。这允许目标操作，因为mongos可以将操作路由到只包含所需数据的分片。
+范围分片的效率取决于所选的分片键。考虑不周的分片键可能导致数据分布不均匀，这可能会抵消分片的一些好处，或者可能导致性能瓶颈。</p>
+
+<h2>Tag Aware Sharding（3.4版本为Zones in Sharded Clusters）</h2>
+
+<p>在分片集群中，您可以标记分片键的特定范围，并将这些标签与分片或分片子集相关联。MongoDB将落入标记范围的读取和写入仅路由到分配了该标记的那些分片。另外，均衡器在均衡时检查标签，确保每一个分片只包含不违反它配置的标签范围的数据。
+每一个标签都有一个包含上限和下限的范围。管理员可以在集群中每一个分片上（shard）分配一个或者更多的标签
+<img src="https://docs.mongodb.com/v3.2/_images/sharded-cluster-tag-aware.png" alt="Alt text"/></p>
+
+<p>标记范围必须使用来自分片键的字段，并遵守复合分片键字段的顺序。
+在选择shard key时，请仔细考虑将来使用标记感知分片的可能性，因为在分片collection后无法更改分片键。
+最常见的是，标记感知分片用于改善跨越多个数据中心的分片簇的数据的局部性。</p>
 
                 </div>
-                <a class="ui large button" href="/2016/12/07/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%881%ef%bc%89">Read More</a>
+                <a class="ui large button" href="/2016/12/22/%ef%bc%88%e7%bf%bb%e8%af%91%ef%bc%89Sharding-mongo%e5%ae%98%e6%96%b9%e6%96%87%e6%a1%a33.2%e7%89%88%e6%9c%ac">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">MongoDB-Sharding常用命令</h3>
+                <div class="postContent">
+                    <p>资料来源： <a href="https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/">https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/</a>
+详细命令参考： <a href="https://docs.mongodb.com/v3.2/reference/sharding/">https://docs.mongodb.com/v3.2/reference/sharding/</a></p>
+
+<h1>分片常用</h1>
+
+<h2>配置Sharding</h2>
+
+<ul>
+<li><p>连接路由服务器</p>
+
+<pre><code>.\bin\mongo.exe admin --port 40000
+</code></pre></li>
+
+<li><p>设置分片服务器</p>
+
+<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27017&#34; })
+或者
+sh.addShard(&#34;127.0.0.1:27100&#34;)
+</code></pre></li>
+
+<li><p>设置要分片的数据库</p>
+
+<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
+或者：
+sh.enableSharding(&#34;qdgame&#34;)
+</code></pre></li>
+
+<li><p>关闭balancing</p>
+
+<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre>
+
+<!-- more --></li>
+
+<li><p>设置要分片的collection</p>
+
+<pre><code>db.runCommand({ shardcollection: &#34;qdgame.backpack&#34;, key: { _id:1}})
+或者
+sh.shardCollection(&#34;qdgame.backpack&#34;,{usrid:1, id:1})
+</code></pre></li>
+
+<li><p>开启balancing</p>
+
+<pre><code>sh.enableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+</ul>
+
+<p>注意：设置一定要在admin数据库下。</p>
+
+<h2>使用hash分片一个collection</h2>
+
+<pre><code>sh.shardCollection( &#34;database.collection&#34;, { &lt;field&gt; : &#34;hashed&#34; } )
+</code></pre>
+
+<h2>改变chunk大小</h2>
+
+<pre><code>db.settings.save( { _id:&#34;chunksize&#34;, value: &lt;size&gt; } )
+</code></pre>
+
+<h2>添加index索引</h2>
+
+<pre><code>db.collection.ensureIndex({a:1,b:-1})
+</code></pre>
+
+<h1>管理分片标签</h1>
+
+<h2>标记一个分片</h2>
+
+<p>当连接到mongos实例时，使用sh.addShardTag（）方法将标记与特定分片关联。单个分片可以具有多个标签，并且多个分片也可以具有相同的标签。</p>
+
+<pre><code>sh.addShardTag(&#34;shard0000&#34;, &#34;NYC&#34;)
+sh.addShardTag(&#34;shard0001&#34;, &#34;NYC&#34;)
+sh.addShardTag(&#34;shard0002&#34;, &#34;SFO&#34;)
+sh.addShardTag(&#34;shard0002&#34;, &#34;NRT&#34;)
+</code></pre>
+
+<p>在连接到mongos实例时，您可以使用sh.removeShardTag（）方法从特定分片中删除标签，如以下示例所示，该示例从分片中删除NRT标签：</p>
+
+<pre><code>sh.removeShardTag(&#34;shard0002&#34;, &#34;NRT&#34;)
+</code></pre>
+
+<h2>标记shard key范围</h2>
+
+<p>在连接到mongos实例时使用sh.addTagRange（）方法来给某个范围的shard key添加标签。任何给定的分片键范围都只具有一个分配的标签。您不能重叠定义的范围，也不能多次标记同一范围。</p>
+
+<pre><code>sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;10001&#34; }, { zipcode: &#34;10281&#34; }, &#34;NYC&#34;)
+sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;11201&#34; }, { zipcode: &#34;11240&#34; }, &#34;NYC&#34;)
+sh.addTagRange(&#34;records.users&#34;, { zipcode: &#34;94102&#34; }, { zipcode: &#34;94135&#34; }, &#34;SFO&#34;)
+</code></pre>
+
+<h2>从shard key范围中删除标记</h2>
+
+<pre><code>use config
+db.tags.remove({ _id: { ns: &#34;records.users&#34;, min: { zipcode: &#34;10001&#34; }}, tag: &#34;NYC&#34; })
+</code></pre>
+
+<h2>访问标签</h2>
+
+<p>sh.status（）列出与每个分片相关联的分片（如果有的话）的标签。shard的标记存在于config数据库的shards
+集合中的shard文档中。</p>
+
+<pre><code>use config
+db.shards.find({ tags: &#34;NYC&#34; })
+</code></pre>
+
+<p>您可以在config数据库的tags集合中找到所有命名空间的标记范围。 sh.status（显示所有标签范围。要返回用NYC标记的所有shard key范围，请使用以下操作：</p>
+
+<pre><code>use config
+db.shards.find({ tags: &#34;NYC&#34; })
+</code></pre>
+
+<h1>例子：根据地区来划分数据</h1>
+
+<h2>场景</h2>
+
+<p>在messages集合中创建测试数据如下：</p>
+
+<pre><code>{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fa&#34;),
+  &#34;country&#34; : &#34;US&#34;,
+  &#34;userid&#34; : 123,
+  &#34;message&#34; : &#34;Hello there&#34;,
+  ...,
+}
+{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fb&#34;),
+  &#34;country&#34; : &#34;UK&#34;,
+  &#34;userid&#34; : 456,
+  &#34;message&#34; : &#34;Good Morning&#34;
+  ...,
+}
+{
+  &#34;_id&#34; : ObjectId(&#34;56f08c447fe58b2e96f595fc&#34;),
+  &#34;country&#34; : &#34;DE&#34;,
+  &#34;userid&#34; : 789,
+  &#34;message&#34; : &#34;Guten Tag&#34;
+  ...,
+}
+</code></pre>
+
+<h3>shard key</h3>
+
+<p>messages集合使用{ country : 1, userid : 1 }组合索引作为shard key。
+每个文档中的country 字段允许在每个不同的country值上创建标签范围。
+相对于country，userid字段为shard key提供一个高基数低频率的元素</p>
+
+<h3>写操作</h3>
+
+<p>在Tag相关的分片中，mongos将到来的文档和配置的tag范围比较。如果文档符合配置标签的范围，mongos将此文档路由到此标签的分片中
+这插入环节，MongoDB可以将不合格任何tag范围的文档路甽�标签的范围，mongos将此文档路由到此标签的分片中
+这插入环节，MongoDB可以将不合格任何tag范围的文档路由到随机的分片中。</p>
+
+<h3>读操作</h3>
+
+<p>如果这个请求至少包含country字段，MongoDB可以路由请求到特定的分片中。
+例如MongoDB可以尝试对以下查询执行有针对性的读取操作：</p>
+
+<pre><code>chatDB = db.getSiblingDB(&#34;chat&#34;)
+chatDB.messages.find( { &#34;country&#34; : &#34;UK&#34; , &#34;userid&#34; : &#34;123&#34; } )
+</code></pre>
+
+<h3>均衡器</h3>
+
+<p>均衡器迁移带有tag的块（Chunk）到适合的分片（shard）。在迁移之前，分片可能包含违反配置的tag和tag范围的块。一旦平衡完成，碎片应只包含不违反其分配的标记和标记范围的块。
+添加个删除标签可以块的迁移。这取决于数据集的大小和标记范围影响的块数量，这些迁移可能会影响集群的性能。</p>
+
+<h2>操作</h2>
+
+<h3>取消均衡器</h3>
+
+<p>为了降低性能影响，可以在集合上禁用平衡器，以确保在配置新标记时不会发生迁移。考虑在特定的计划窗口中运行均衡器。</p>
+
+<pre><code>sh.disableBalancing(&#34;chat.message&#34;)
+</code></pre>
+
+<p>使用sh.isBalancerRunning()来检查平衡器进程当前是否正在运行。等待任何当前平衡回合完成后再继续。</p>
+
+<h3>为每一个分片添加标签</h3>
+
+<p>````
+sh.addShardTag(<shard name="">, “NA”)</shard></p>
+
+<pre><code>您可以通过运行sh.status（）来查看分配给给定分片的标签。
+
+### 定义标签范围
+使用sh.addTagRange()方法。这个方法需要：
+- 完成的目标collection的名字
+- 范围的下限
+- 范围的上限
+- 标签的名字
+
+</code></pre>
+
+<p>sh.addTagRange(
+  “chat.messages”,
+  { “country” : “US”, “userid” : MinKey },
+  { “country” : “US”, “userid” : MaxKey },
+  “NA”
+)</p>
+
+<pre><code>### 开启均衡器
+</code></pre>
+
+<p>sh.enableBalancing(“chat.message”)
+```
+使用sh.isBalancerRunning()来检查平衡器进程当前是否正在运行</p>
+
+<h3>查看更改</h3>
+
+<p>您可以使用sh.status()</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/22/MongoDB-Sharding%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">《Go语言圣经》学习小记（2）</h3>
+                <div class="postContent">
+                    <h2>函数</h2>
+
+<h3>函数声明</h3>
+
+<p>在函数体中，函数的形参作为局部变量，被初始化为调用者提供的值。函数的形参和有名返回值作为<strong>函数最外层的局部变量</strong>，被存储在相同的词法块中。
+实参通过值的方式传递，因此函数的形参是实参的拷贝。对形参进行修改不会影响实参。但是，如果实参包括引用类型，如指针，slice(切片)、map、<strong>function</strong>、channel等类型，实参可能会由于函数的简介引用被修改。
+<strong>没有函数体的函数声明，这表示该函数不是以Go实现的。</strong>这样的声明定义了函数标识符。</p>
+
+<pre><span class="kwd">package</span> <span class="pln">math</span>
+<span class="kwd">func</span> <span class="typ">Sin</span><span class="pun">(</span><span class="pln">x</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="kwd">float</span> <span class="com">//implemented in assembly language</span>
+</pre>
+
+<p>注：此代码来自官方的math包中
+<!-- more --></p>
+
+<h3>错误</h3>
+
+<p>在Go中，函数运行失败时会返回错误信息，这些错误信息被认为是一种预期的值而非异常（exception）。</p>
+
+<h3>函数值</h3>
+
+<p>在Go中，函数被看作第一类值（first-class values）：函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">square</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">n</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
+<span class="kwd">func</span> <span class="pln">negative</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pun">-</span><span class="pln">n</span> <span class="pun">}</span>
+<span class="kwd">func</span> <span class="pln">product</span><span class="pun">(</span><span class="pln">m</span><span class="pun">,</span> <span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">m</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
+<span class="pln">f</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">square</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;9&#34;</span>
+<span class="pln">f</span> <span class="pun">=</span> <span class="pln">negative</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;-3&#34;</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span> <span class="com">// &#34;func(int) int&#34;</span>
+<span class="pln">f</span> <span class="pun">=</span> <span class="pln">product</span> <span class="com">// compile error: can&#39;t assign func(int, int) int to func(int) int</span>
+</pre>
+
+<p>函数类型的零值是nil。调用值为nil的函数值会引起panic错误
+函数值可以与nil比较
+但是函数值之间是不可比较的，也不能用函数值作为map的key。</p>
+
+<h3>匿名函数</h3>
+
+<p>拥有函数名的函数只能在包级语法块中被声明，通过函数字面量（function literal），我们可绕过这一限制，在任何表达式中表示一个函数值。</p>
+
+<pre>	<span class="kwd">var</span> <span class="pln">visitAll</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span>
+	<span class="pln">visitAll</span> <span class="pun">=</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">{</span>
+		<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">item</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">items</span> <span class="pun">{</span>
+			<span class="kwd">if</span> <span class="pun">!</span><span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">{</span>
+				<span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">true</span>
+				<span class="pln">visitAll</span><span class="pun">(</span><span class="pln">m</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span><span class="pun">)</span>
+				<span class="pln">order</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">order</span><span class="pun">,</span> <span class="pln">item</span><span class="pun">)</span>
+			<span class="pun">}</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+</pre>
+
+<p>当匿名函数需要被递归调用时，我们必须首先声明一个变量（在上面的例子中，我们首先声明visitAll），再将匿名函数赋值给这个变量。如果不分成两部，函数字面量无法与visitAll绑定.</p>
+
+<h3>警告：捕获迭代变量</h3>
+
+<p><strong>这节极其重要！！！</strong></p>
+
+<p>本节，将介绍Go词法作用域的一个陷阱。请务必仔细的阅读，弄清楚发生问题的原因。即使是经验丰富
+的程序员也会在这个问题上犯错误。
+考虑这个样一个问题：你被要求首先创建一些目录，再将目录删除。在下面的例子中我们用函数值来完
+成删除操作。下面的示例代码需要引入os包。为了使代码简单，我们忽略了所有的异常处理。</p>
+
+<p>// …do some work…
+for _, rmdir := range rmdirs {
+rmdir() // clean up
+}
+你可能会感到困惑，为什么要在循环体中用循环变量d赋值一个新的局部变量，而不是像下面的代码一样
+直接使用循环变量dir。需要注意，下面的代码是错误的。</p>
+
+<pre><span class="kwd">var</span> <span class="pln">rmdirs</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span>
+<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">d</span>               <span class="com">// NOTE: necessary!</span>
+	<span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// creates parent directories too</span>
+	<span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+		<span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">)</span>
+	<span class="pun">}</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>问题的原因在于循环变量的作用域。在上面的程序中，for循环语句引入了新的词法块，循环变量dir在这个词法块中被声明。在该循环中生成的所有函数值都共享相同的循环变量。需要注意，函数值中记录的是循环变量的内存地址，而不是循环变量某一时刻的值。以dir为例，后续的迭代会不断更新dir的值，当删除操作执行时，for循环已完成，dir中存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个�存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个问题，我们会引入一个与循环变量同名的局部变量，作为循环变量的副本。比如下面的变量dir，虽然这看起来很奇怪，但却很有用。</p>
+
+<pre><span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dir</span> <span class="com">// declares inner dir, initialized to outer dir</span>
+    <span class="com">// ...</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这个问题不仅存在基于range的循环，在下面的例子中，对循环变量i的使用也存在同样的问题：</p>
+
+<pre><span class="pln">dirs</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span>
+<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+    <span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// OK</span>
+    <span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+        <span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// NOTE: incorrect!</span>
+    <span class="pun">}</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>如果你使用go语句（第八章）或者defer语句（5.8节）会经常遇到此类问题。这不是go或defer本身导致
+的，而是因为它们都会等待循环结束后，再执行函数值。</p>
+
+<p><strong>注：for的词法作用域导致循环的时候，dir为同一个内存地址，传递给Println函数的是dir的值。</strong></p>
+
+<pre><span class="kwd">func</span> <span class="pln">main</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
+    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">v</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">c</span> <span class="pun">{</span>
+        <span class="pln">defer</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">v</span><span class="pun">)</span>
+        <span class="pun">}</span><span class="pun">(</span><span class="pun">)</span>
+    <span class="pun">}</span>
+    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="str">&#34;Over&#34;</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<h3>可变参数</h3>
+
+<p>在声明可变参数函数时，需要在参数列表的最后一个参数类型之前加上省略符号“…”，这表示该函数会接收任意数量的<strong>该类型参数</strong>。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">sum</span><span class="pun">(</span><span class="pln">vals</span> <span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span>
+    <span class="pln">total</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span>
+    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">val</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">vals</span> <span class="pun">{</span>
+        <span class="pln">total</span> <span class="pun">+</span><span class="pun">=</span> <span class="pln">val</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="pln">total</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在函数体中,vals被看作是类型为[] int的切片。</p>
+
+<h2>方法</h2>
+
+<p>尽管没有被大众所接受的明确的OOP的定义，从我们的理解来讲，一个对象其实也就是一个简单的值或者一个变量，在这个对象中会包含一些方法，而一个方法则是一个一个和特殊类型关联的函数。一个面向对象的程序会用方法来表达其属性和对应的操作，这样使用这个对象的用户就不需要直接去操作对象，而是借助方法来做这些事情。</p>
+
+<h3>方法声明</h3>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">p</span> <span class="typ">Point</span><span class="pun">)</span> <span class="typ">Distance</span><span class="pun">(</span><span class="pln">q</span> <span class="typ">Point</span><span class="pun">)</span> <span class="kwd">float64</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">math</span><span class="pun">.</span><span class="typ">Hypot</span><span class="pun">(</span><span class="pln">q</span><span class="pun">.</span><span class="typ">X</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">X</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>上面的代码里那个附加的参数p，叫做方法的接收器(receiver)，早期的面向对象语言留下的遗产将调用
+一个方法称为“向一个对象发送消息”。
+在Go语言中，我们并不会像其它语言那样用this或者self作为接收器；我们可以任意的选择接收器的名字。由于接收器的名字经常会被使用到，所以保持其在方法间传递时的一致性和简短性是不错的主意。这里的建议是可以使用其类型的第一个字母，比如这里使用了Point的首字母p。</p>
+
+<h2>接口</h2>
+
+<p>在Go语言中，变量总是被一个定义明确的值初始化，即使接口类型也不例外。对于一个接口的零值就是它的类型和值的部分都是nil</p>
+
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th align="center">value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>type</td>
+<td align="center">nil</td>
+</tr>
+
+<tr>
+<td>value</td>
+<td align="center">nil</td>
+</tr>
+</tbody>
+</table>
+
+<p>一个接口值可以持有任意大的动态值。接口值可以使用＝＝和！＝来进行比较。两个接口值相等仅当它们都是nil值或者它们的动态类型相同并且动态值也根据这个动态类型的＝＝操作相等。</p>
+
+<h2>GoRoutines 和 channels</h2>
+
+<h3>Channels</h3>
+
+<p>和map类似，channel也一个对应make创建的底层数据结构的引用。
+复制一个channel或用于函数参数传递时，只是拷贝了一个channel引用，因此调用者和被调用者将引用同一channel对象。和其它的引用类型一样，channel的零值也是nil。
+两个相同类型的channel可以使用==运算符比较。如果两个channel引用的是相通的对象，那么比较的结果为真
+当一个channel被关闭后，再向该channel发送数据将导致panic异常。当一个被关闭的channel中已经发送的数据都被成功接收后，后续的接收操作将不再阻塞，它们会立即返回一个零值。</p>
+
+<h3>不带缓存的Channels</h3>
+
+<p>基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。
+你并不需要关闭每一个channel。只要当需要告诉接收者goroutine，所有的数据已经全部发送时才需要关闭channel。不管一个channel是否被关闭，当它没有被引用时将会被Go语言的垃圾自动回收器回收。（不要将关闭一个打开文件的操作和关闭一个channel操作混淆。对于每个打开的文件，都需要在不使用的使用调用对应的Close方法来关闭文件。）</p>
+
+<h3>基于select的多路复用</h3>
+
+<p>如果多个case同时就绪时，select会随机地选择一个执行，这样来保证每一个channel都有平等的被select的机会。</p>
+
+<pre><span class="kwd">for</span> <span class="pun">{</span>
+    <span class="pln">select</span> <span class="pun">{</span>
+    <span class="kwd">case</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">done</span><span class="pun">:</span>
+        <span class="com">// Drain fileSizes to allow existing goroutines to finish.</span>
+        <span class="kwd">for</span> <span class="pln">range</span> <span class="pln">fileSizes</span> <span class="pun">{</span>
+            <span class="com">// Do nothing.</span>
+        <span class="pun">}</span>
+        <span class="kwd">return</span>
+    <span class="kwd">case</span> <span class="pln">size</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">fileSizes</span><span class="pun">:</span>
+        <span class="com">// ...</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在结束之前我们需要把fileSizes channel中的内容“排”空，在channel被关闭之前，舍弃掉所有值。</p>
+
+<h2>基于共享变量的并发</h2>
+
+<h3>竞争条件</h3>
+
+<p>一个函数在线性程序中可以正确地工作。如果在并发的情况下，这个函数依然可以正确地工 作的话，那么我们就说这个函数是并发安全的，并发安全的函数不需要额外的同步工作。我们可以把这 个概念概括为一个特定类型的一些方法和操作函数，如果这个类型是并发安全的话，那么所有它的访问 方法和操作就都是并发安全的。
+竞争条件指的是程序在多个goroutine交叉执行操作时，没有给出正确的结果。竞争条件是很恶劣的一种场景，因为这种问题会一直潜伏在你的程序里，然后在非常少见的时候蹦出来
+<strong>数据竞争的定义</strong>：数据竞争会在两个以上的goroutine并发访问相同的变量且至少其中一个为写操作时发生。根据上述定义，有三种方式可以避免数据竞争：
+- 第一种方法是不要去写变量。
+- 第二种避免数据竞争的方法是，避免从多个goroutine访问变量。1. 变量都被限定在了一个单独的goroutine中。 由于其它的goroutine不能够直接访问变量，它们只能使用一个channel来发送给指定的goroutine请求来查询更新变量。这也就是Go的口头禅“不要使用共享数据来通信；使用通信来共享数据”。一个提供对 一个指定的变量通过cahnnel来请求goroutine叫做这个变量的监控(monitor)goroutine。2.即使当一个变量无法在其整个生命周期内被绑定到一个独立的goroutine，绑定依然是并发问题的一个解 决方案。例如在一条流水线上的goroutine之间共享变量是很普遍的行为，在这两者间会通过channel来传输地址信息。（注： 串行channel）
+- 第三种避免数据竞争的方法是允许很多goroutine去访问变量，但是在同一个时刻最多只有一个 goroutine在访问。这种方式被称为“互斥”</p>
+
+<h3>Goroutines和线程</h3>
+
+<p>每一个OS线程都有一个固定大小的内存块(一般会是2MB)来做栈，这个栈会用来存储当前正在被调用或挂 起(指在调用其它函数时)的函数的内部变量。
+一个goroutine会以一个很小的栈开始其生命周期，一般只需要2KB。一个goroutine的栈，和操作 系统线程一样，会保存其活跃或挂起的函数调用的本地变量，但是和OS线程不太一样的是一个goroutine 的栈大小并不是固定的；栈的大小会根据需要动态地伸缩。而goroutine的栈的最大值有1GB，比传统的 固定大小的线程栈要大得多，</p>
+
+<h3>Goroutine调度</h3>
+
+<p>OS线程会被操作系统内核调度。每几毫秒，一个硬件计时器会中断处理器，这会调用一个叫作scheduler 的内核函数。这个函数会挂起当前执行的线程并保存内存中它的寄存器内容，检查线程列表并决定下一 次哪个线程可以被运行，并从内存中恢复该线程的寄存器信息，然后恢复执行该线程的现场并开始执行 线程。因为操作系统线程是被内核所调度，所以从一个线程向另一个“移动”需要完整的上下文切换， 也就是说，保存一个用户线程的状态到内存，恢复另一个线程的到寄存器，然后更新调度器的数据结 构。这几步操作很慢，因为其局部性很差需要几次内存访问，并且会增加运行的cpu周期。</p>
+
+<p>Go的运行时包含了其自己的调度器，这个调度器使用了一些技术手段，比如m:n调度，因为其会在n个操 作系统线程上多工(调度)m个goroutine。Go调度器的工作和内核的调度是相似的，但是这个调度器只关 注单独的Go程序中的goroutine(译注：按程序独立)。
+和操作系统的线程调度不同的是，Go调度器并不是用一个硬件定时器而是被Go语言”建筑”本身进行调度 的。例如当一个goroutine调用了time.Sleep或者被channel调用或者mutex操作阻塞时，调度器会使其进 入休眠并开始执行另一个goroutine直到时机到了再去唤醒第一个goroutine。因为因为这种调度方式不 需要进入内核的上下文，所以重新调度一个goroutine比调度一个线程代价要低得多。</p>
+
+<h2>包和工具</h2>
+
+<p>有时候，一个中间的状态可能也是有用的，对于一小部分信任的包是可见的，但并不是对所有调用者都 可见。例如，当我们计划将一个大的包拆分为很多小的更容易维护的子包，但是我们并不想将内部的子 包结构也完全暴露出去。同时，我们可能还希望在内部子包之间共享一些通用的处理包，或者我们只是 想实验一个新包的还并不稳定的接口，暂时只暴露给一些受限制的用户使用。
+为了满足这些需求，Go语言的构建工具对包含internal名字的路径段的包导入路径做了特殊处理。这种 包叫internal包，一个internal包只能被和internal目录有同一个父目录的包所导入。</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/20/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%882%ef%bc%89">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">mongo数据库sharding学习记录</h3>
+                <div class="postContent">
+                    <p>参考文章：<a href="http://www.runoob.com/mongodb/mongodb-sharding.html">http://www.runoob.com/mongodb/mongodb-sharding.html</a></p>
+
+<p>windows系统。mongo3.2版本</p>
+
+<p>建立目录s0,s1,log,config</p>
+
+<p>步骤一：启动Shard Server</p>
+
+<pre><code>.\bin\mongod.exe --port 27100 --dbpath=.\mongos\s0 --logpath=.\mongos\log\s0.log --logappend --journal --storageEngine=mmapv1 --shardsvr
+
+.\bin\mongod.exe --port 27101 --dbpath=.\mongos\s1 --logpath=.\mongos\log\s1.log --logappend --journal --storageEngine=mmapv1 --shardsvr
+</code></pre>
+
+<p>步骤二： 启动Config Server</p>
+
+<pre><code>.\bin\mongod.exe --port 27200 --dbpath=.\mongos\config --logpath=.\mongos\log\config.log --logappend --journal --storageEngine=mmapv1 --configsvr
+</code></pre>
+
+<p>步骤三： 启动Route Process</p>
+
+<pre><code>.\bin\mongos.exe --port 40000 --configdb localhost:27200  --logpath=.\mongos\log\router.log --chunkSize 1
+</code></pre>
+
+<p>注意:
+1. 我这里不加–configsvr就出现Surprised to discover that localhost:27200 does not believe it is a config server错误。
+2. chunkSize太大的话，会导致插入很多很多数据后才分片。一开始没注意，以为设置错误没有分片。。。chunkSize以M为单位。</p>
+
+<p>步骤四： 配置Sharding</p>
+
+<ul>
+<li><p>连接路由服务器</p>
+
+<pre><code>.\bin\mongo.exe admin --port 40000
+</code></pre></li>
+
+<li><p>设置分片服务器</p>
+
+<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:40000&#34; })
+或者
+sh.addShard(&#34;127.0.0.1:27100&#34;)
+</code></pre></li>
+
+<li><p>设置要分片的数据库</p>
+
+<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
+或者：
+sh.enableSharding(&#34;qdgame&#34;)
+</code></pre></li>
+
+<li><p>关闭balancing</p>
+
+<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+
+<li><p>设置分片collection的index</p>
+
+<pre><code>use qdgame
+db.backpack.ensureIndex({usrid:1,id:1})
+</code></pre></li>
+
+<li><p>设置要分片的collection</p>
+
+<pre><code>db.runCommand({ shardcollection: &#34;qdgame.backpack&#34;, key: { usrid:1, id:1}})
+或者
+sh.shardCollection(&#34;qdgame.backpack&#34;,{usrid:1, id:1})
+</code></pre></li>
+
+<li><p>开启balancing</p>
+
+<pre><code>sh.enableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+</ul>
+
+<p>注意：设置一定要在admin数据库下。
+e.backpack”,{usrid:1, id:1})</p>
+
+<pre><code>
+- 开启balancing
+</code></pre>
+
+<p>sh.enableBalancing(“qdgame.backpack”)
+```</p>
+
+<p>注意：设置一定要在admin数据库下。</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/09/mongo%e6%95%b0%e6%8d%ae%e5%ba%93sharding%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95">Read More</a>
                 <h4 class="ui horizontal header divider">
                     <a href="#">这是分界线哦~~</a>
                 </h4>

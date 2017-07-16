@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/go-yaml/yaml"
 	"github.com/henrylee2cn/pholcus/common/goquery"
 	"github.com/russross/blackfriday"
@@ -102,7 +100,6 @@ func (p *Post) ParseMetaData() (err error) {
 			metaData = append(metaData, line...)
 		}
 	}
-	log.Debugf("metadata: %v", string(metaData))
 	if !ok || !finished {
 		return fmt.Errorf("Cannot find the metadata of the post!")
 	}

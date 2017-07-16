@@ -178,10 +178,10 @@
                         <i class="sidebar icon"></i>
                     </a>
                     <div class="left item">
-                        <a class="ui inverted button">清 | 狂</a>
+                        <a class="ui inverted button" href="/">清 | 狂</a>
                     </div>
                     <div class="right item">
-                        <a class="active item">Home</a>
+                        <a class="active item" href="/">Home</a>
                         <a class="item">分类</a>
                         <a class="item">Tags</a>
                         <a class="item">关于我</a>
@@ -203,106 +203,6 @@
 
         <div class="ui vertical stripe segment">
             <div class="ui text container">
-                
-                <h3 class="ui header">寒衫浮梦-歌词</h3>
-                <div class="postContent">
-                    <h1>寒衫浮梦</h1>
-
-<p>笔落书卷半</p>
-
-<p>细呷温酒纸墨香</p>
-
-<p>迹痕潦潦 聆风旖旎</p>
-
-<p>画浮生一纸水青 未干</p>
-
-<p>念转凌霄权</p>
-
-<p>御笔不点寒白衫</p>
-
-<p>拂袖河山 纵笔江川</p>
-
-<p>赋此间一抹丹砂 清狂</p>
-
-<p>兰亭袅袅入凡尘</p>
-
-<p>行书以鉴当琼月</p>
-
-<p>锋毫冽冽提宫阙</p>
-
-<p>白绢为约伊人决</p>
-
-<p>苍鸟扶之青云兮</p>
-
-<p>青冢暮而依别离</p>
-
-<p>羁鹰坠羽寻芜兮</p>
-
-<p>封笔沉沙以伴渺娉</p>
-
-<p>伏案倾旧卷</p>
-
-<p>恍若入梦琴瑟婉</p>
-
-<p>尘中千叹 何人语堪</p>
-
-<p>惟作一介寒衫旧 轻叩</p>
-
-<p>清冽酒坛散</p>
-
-<p>一梦惊世长安仙</p>
-
-<p>浅吟轻唱 对错何妨</p>
-
-<p>唯记一点荧光青 微凉</p>
-
-<p>兰亭袅袅入凡尘</p>
-
-<p>行书以鉴当琼月</p>
-
-<p>锋毫冽冽提宫阙</p>
-
-<p>白绢为约伊人决</p>
-
-<p>苍鸟扶之青云兮</p>
-
-<p>青冢暮而依别离</p>
-
-<p>羁鹰坠羽寻芜兮</p>
-
-<p>封笔沉沙以伴娉婷</p>
-
-<p>渚江清清曳纸莲</p>
-
-<p>以寄天方姝旧还</p>
-
-<p>燕谷轻轻拙荆唤</p>
-
-<p>传以九幽何回荡</p>
-
-<p>倦眉蹙之终南兮</p>
-
-<p>风动玲心而愁忆</p>
-
-<p>悴鬓不觉缃素兮</p>
-
-<p>沧山映水流年何必</p>
-
-<p>终不见蛾眉轻舞霓裳 流袖翩跹��</p>
-
-<p>风动玲心而愁忆</p>
-
-<p>悴鬓不觉缃素兮</p>
-
-<p>沧山映水流年何必</p>
-
-<p>终不见蛾眉轻舞霓裳 流袖翩跹</p>
-
-                </div>
-                <a class="ui large button" href="/2016/12/26/%e5%af%92%e8%a1%ab%e6%b5%ae%e6%a2%a6-%e6%ad%8c%e8%af%8d">Read More</a>
-                <h4 class="ui horizontal header divider">
-                    <a href="#">这是分界线哦~~</a>
-                </h4>
                 
                 <h3 class="ui header">《Go语言圣经》学习小记（1）</h3>
                 <div class="postContent">
@@ -473,240 +373,379 @@ Go语言有一个特性让我们只声明一个成员对应的数据类型而不
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">《Go语言圣经》学习小记（2）</h3>
+                <h3 class="ui header">Error handling and Go (翻译)</h3>
                 <div class="postContent">
-                    <h2>函数</h2>
+                    <p>本篇文章来自《The Go Blog》。文章地址为<a href="https://blog.golang.org/error-handling-and-go">https://blog.golang.org/error-handling-and-go</a>
+下面是在下的翻译。因为看英文看完就忘，所以翻译翻译，聊以自慰。</p>
 
-<h3>函数声明</h3>
+<h2>错误处理和Go</h2>
 
-<p>在函数体中，函数的形参作为局部变量，被初始化为调用者提供的值。函数的形参和有名返回值作为<strong>函数最外层的局部变量</strong>，被存储在相同的词法块中。
-实参通过值的方式传递，因此函数的形参是实参的拷贝。对形参进行修改不会影响实参。但是，如果实参包括引用类型，如指针，slice(切片)、map、<strong>function</strong>、channel等类型，实参可能会由于函数的简介引用被修改。
-<strong>没有函数体的函数声明，这表示该函数不是以Go实现的。</strong>这样的声明定义了函数标识符。</p>
+<p>2011年7月12日</p>
 
-<pre><span class="kwd">package</span> <span class="pln">math</span>
-<span class="kwd">func</span> <span class="typ">Sin</span><span class="pun">(</span><span class="pln">x</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="kwd">float</span> <span class="com">//implemented in assembly language</span>
+<h3>引言</h3>
+
+<p>如果你写过Go的代码，你可能已经遇到了内置的error类型。Go的代码使用error表示异常状态。例如os.Open函数打开文件失败的时候，返回一个不为nil的error值。</p>
+
+<pre><span class="kwd">func</span> <span class="typ">Open</span><span class="pun">(</span><span class="pln">name</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">(</span><span class="pln">file</span> <span class="pun">*</span><span class="typ">File</span><span class="pun">,</span> <span class="pln">err</span> <span class="pln">error</span><span class="pun">)</span>
 </pre>
 
-<p>注：此代码来自官方的math包中
+<p>下面的代码使用os.Open打开一个文件。如果出现一个error,它会调用log.Fatal来打印出错误结束。</p>
+
+<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="str">&#34;filename.ext&#34;</span><span class="pun">)</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+<span class="com">// do something with the open *File f</span>
+</pre>
+
+<p>在Go中，你仅需要知道这些关于error类型的知识，就能做很多事情了，但是在这篇文章中我们将仔细研究error，并讨论在Go中的一些好的错误处理的实例
 <!-- more --></p>
 
-<h3>错误</h3>
+<h3>error 类型</h3>
 
-<p>在Go中，函数运行失败时会返回错误信息，这些错误信息被认为是一种预期的值而非异常（exception）。</p>
+<p>error类型是一个接口(interface)类型。一个error变量代表任意一个能将自己描绘成字符串的值。
+这个是接口的定义</p>
 
-<h3>函数值</h3>
-
-<p>在Go中，函数被看作第一类值（first-class values）：函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回。</p>
-
-<pre><span class="kwd">func</span> <span class="pln">square</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">n</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
-<span class="kwd">func</span> <span class="pln">negative</span><span class="pun">(</span><span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pun">-</span><span class="pln">n</span> <span class="pun">}</span>
-<span class="kwd">func</span> <span class="pln">product</span><span class="pun">(</span><span class="pln">m</span><span class="pun">,</span> <span class="pln">n</span> <span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">m</span> <span class="pun">*</span> <span class="pln">n</span> <span class="pun">}</span>
-<span class="pln">f</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">square</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;9&#34;</span>
-<span class="pln">f</span> <span class="pun">=</span> <span class="pln">negative</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">f</span><span class="pun">(</span><span class="dec">3</span><span class="pun">)</span><span class="pun">)</span> <span class="com">// &#34;-3&#34;</span>
-<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span> <span class="com">// &#34;func(int) int&#34;</span>
-<span class="pln">f</span> <span class="pun">=</span> <span class="pln">product</span> <span class="com">// compile error: can&#39;t assign func(int, int) int to func(int) int</span>
-</pre>
-
-<p>函数类型的零值是nil。调用值为nil的函数值会引起panic错误
-函数值可以与nil比较
-但是函数值之间是不可比较的，也不能用函数值作为map的key。</p>
-
-<h3>匿名函数</h3>
-
-<p>拥有函数名的函数只能在包级语法块中被声明，通过函数字面量（function literal），我们可绕过这一限制，在任何表达式中表示一个函数值。</p>
-
-<pre>	<span class="kwd">var</span> <span class="pln">visitAll</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span>
-	<span class="pln">visitAll</span> <span class="pun">=</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">items</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">{</span>
-		<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">item</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">items</span> <span class="pun">{</span>
-			<span class="kwd">if</span> <span class="pun">!</span><span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">{</span>
-				<span class="pln">seen</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">true</span>
-				<span class="pln">visitAll</span><span class="pun">(</span><span class="pln">m</span><span class="pun">[</span><span class="pln">item</span><span class="pun">]</span><span class="pun">)</span>
-				<span class="pln">order</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">order</span><span class="pun">,</span> <span class="pln">item</span><span class="pun">)</span>
-			<span class="pun">}</span>
-		<span class="pun">}</span>
-	<span class="pun">}</span>
-</pre>
-
-<p>当匿名函数需要被递归调用时，我们必须首先声明一个变量（在上面的例子中，我们首先声明visitAll），再将匿名函数赋值给这个变量。如果不分成两部，函数字面量无法与visitAll绑定.</p>
-
-<h3>警告：捕获迭代变量</h3>
-
-<p><strong>这节极其重要！！！</strong></p>
-
-<p>本节，将介绍Go词法作用域的一个陷阱。请务必仔细的阅读，弄清楚发生问题的原因。即使是经验丰富
-的程序员也会在这个问题上犯错误。
-考虑这个样一个问题：你被要求首先创建一些目录，再将目录删除。在下面的例子中我们用函数值来完
-成删除操作。下面的示例代码需要引入os包。为了使代码简单，我们忽略了所有的异常处理。</p>
-
-<p>// …do some work…
-for _, rmdir := range rmdirs {
-rmdir() // clean up
-}
-你可能会感到困惑，为什么要在循环体中用循环变量d赋值一个新的局部变量，而不是像下面的代码一样
-直接使用循环变量dir。需要注意，下面的代码是错误的。</p>
-
-<pre><span class="kwd">var</span> <span class="pln">rmdirs</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span>
-<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-	<span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">d</span>               <span class="com">// NOTE: necessary!</span>
-	<span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// creates parent directories too</span>
-	<span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-		<span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dir</span><span class="pun">)</span>
-	<span class="pun">}</span><span class="pun">)</span>
+<pre><span class="kwd">type</span> <span class="pln">error</span> <span class="kwd">interface</span> <span class="pun">{</span>
+    <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span>
 <span class="pun">}</span>
 </pre>
 
-<p>问题的原因在于循环变量的作用域。在上面的程序中，for循环语句引入了新的词法块，循环变量dir在这个词法块中被声明。在该循环中生成的所有函数值都共享相同的循环变量。需要注意，函数值中记录的是循环变量的内存地址，而不是循环变量某一时刻的值。以dir为例，后续的迭代会不断更新dir的值，当删除操作执行时，for循环已完成，dir中存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个�存储的值等于最后一次迭代的值。这意味着，每次对os.RemoveAll的调用删除的都是相同的目录。通常，为了解决这个问题，我们会引入一个与循环变量同名的局部变量，作为循环变量的副本。比如下面的变量dir，虽然这看起来很奇怪，但却很有用。</p>
+<p>error类型如同其他所有内置类型是在universe block(<a href="https://golang.org/ref/spec#Blocks">The universe block encompasses all Go source text.</a>)中预声明（<a href="https://golang.org/ref/spec#Predeclared_identifiers">predeclare</a>）的。
+最常使用的error实例是error包中未导出（export）的errorString类型。</p>
 
-<pre><span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">dir</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dir</span> <span class="com">// declares inner dir, initialized to outer dir</span>
-    <span class="com">// ...</span>
+<pre><span class="com">// errorString is a trivial implementation of error.</span>
+<span class="kwd">type</span> <span class="pln">errorString</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="pln">s</span> <span class="pln">string</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="pln">errorString</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">s</span>
 <span class="pun">}</span>
 </pre>
 
-<p>这个问题不仅存在基于range的循环，在下面的例子中，对循环变量i的使用也存在同样的问题：</p>
+<p>你可以使用errors.New函数来构建一个这样的值。它接受一个字符串，将之转成errors.errorString，并返回error值</p>
 
-<pre><span class="pln">dirs</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">tempDirs</span><span class="pun">(</span><span class="pun">)</span>
-<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
-    <span class="pln">os</span><span class="pun">.</span><span class="typ">MkdirAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="dec">0755</span><span class="pun">)</span> <span class="com">// OK</span>
-    <span class="pln">rmdirs</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">rmdirs</span><span class="pun">,</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-        <span class="pln">os</span><span class="pun">.</span><span class="typ">RemoveAll</span><span class="pun">(</span><span class="pln">dirs</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// NOTE: incorrect!</span>
-    <span class="pun">}</span><span class="pun">)</span>
+<pre><span class="com">// New returns an error that formats as the given text.</span>
+<span class="kwd">func</span> <span class="typ">New</span><span class="pun">(</span><span class="pln">text</span> <span class="pln">string</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">errorString</span><span class="pun">{</span><span class="pln">text</span><span class="pun">}</span>
 <span class="pun">}</span>
 </pre>
 
-<p>如果你使用go语句（第八章）或者defer语句（5.8节）会经常遇到此类问题。这不是go或defer本身导致
-的，而是因为它们都会等待循环结束后，再执行函数值。</p>
+<p>这是你可能会使用的errors.New的情况：</p>
 
-<p><strong>注：for的词法作用域导致循环的时候，dir为同一个内存地址，传递给Println函数的是dir的值。</strong></p>
-
-<pre><span class="kwd">func</span> <span class="pln">main</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
-    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">v</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">c</span> <span class="pun">{</span>
-        <span class="pln">defer</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
-            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">v</span><span class="pun">)</span>
-        <span class="pun">}</span><span class="pun">(</span><span class="pun">)</span>
+<pre><span class="kwd">func</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pln">f</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="pun">(</span><span class="kwd">float64</span><span class="pun">,</span> <span class="pln">error</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">errors</span><span class="pun">.</span><span class="typ">New</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number&#34;</span><span class="pun">)</span>
     <span class="pun">}</span>
-    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="str">&#34;Over&#34;</span><span class="pun">)</span>
+    <span class="com">// implementation</span>
 <span class="pun">}</span>
 </pre>
 
-<h3>可变参数</h3>
+<p>使用一个负数参数来调用Sqrt，会得到一个非nil的error值（具体的表示是一个errors.errorString值）。调用者能通过<code>error</code>类型的Error方法获取错误字符串(“math: square root of…“)，或者就直接输出它：</p>
 
-<p>在声明可变参数函数时，需要在参数列表的最后一个参数类型之前加上省略符号“…”，这表示该函数会接收任意数量的<strong>该类型参数</strong>。</p>
+<pre><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="typ">Sqrt</span><span class="pun">(</span><span class="pun">-</span><span class="dec">1</span><span class="pun">)</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
 
-<pre><span class="kwd">func</span> <span class="pln">sum</span><span class="pun">(</span><span class="pln">vals</span> <span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="kwd">int</span><span class="pun">)</span> <span class="kwd">int</span> <span class="pun">{</span>
-    <span class="pln">total</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span>
-    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">val</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">vals</span> <span class="pun">{</span>
-        <span class="pln">total</span> <span class="pun">+</span><span class="pun">=</span> <span class="pln">val</span>
+<p>fmt包通过调用它的Error()方法格式化error类型的值。
+这个是错误的实现总结上下文的方法。错误应该由os.Open格式化返回为”open /etc/passwd: permission denied,” ,而不仅仅是”permission denied.“由Sqrt返回的错误缺少了关于无效参数的信息。
+在fmt包中有个有用的函数Errorf,用于增加这个信息。它根据 <code>Printf</code>规则来格式化字符串，并返回一个由errors.New创建的error类型。</p>
+
+<pre><span class="kwd">if</span> <span class="pln">f</span> <span class="pun">&lt;</span> <span class="dec">0</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="dec">0</span><span class="pun">,</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>在许多情况下fmt.Errorf已经足够 ，但是既然error是一个interface，你可以使用任意的数据结构作为error，让调用者来检查错误的详细信息。
+举个例子，我们假想的调用也许想重新使用这个无效参数来调用Sqrt。我们能通过定义一个新的error的实现完成这个目标，而不是使用errors.errorString：</p>
+
+<pre><span class="kwd">type</span> <span class="typ">NegativeSqrtError</span> <span class="kwd">float64</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">f</span> <span class="typ">NegativeSqrtError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span>
+    <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;math: square root of negative number %g&#34;</span><span class="pun">,</span> <span class="kwd">float64</span><span class="pun">(</span><span class="pln">f</span><span class="pun">)</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>复杂的调用可以使用类型断言（<a href="https://golang.org/ref/spec#Type_assertions">type assertion</a>）来检查NegativeSqrtError并特别处理，当调用者将error传递给fmt.Println或者log.Fatal的时候，不会有任何行为上的变化。
+再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中�任何行为上的变化。
+再举个例子，当json.Decode函数解析一个JSON blob遇到语法错误时，返回一个json包中指定的SyntaxError类型。</p>
+
+<pre><span class="kwd">type</span> <span class="typ">SyntaxError</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="pln">msg</span>    <span class="pln">string</span> <span class="com">// description of error</span>
+    <span class="typ">Offset</span> <span class="kwd">int64</span>  <span class="com">// error occurred after reading Offset bytes</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">e</span> <span class="pun">*</span><span class="typ">SyntaxError</span><span class="pun">)</span> <span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span> <span class="pln">string</span> <span class="pun">{</span> <span class="kwd">return</span> <span class="pln">e</span><span class="pun">.</span><span class="pln">msg</span> <span class="pun">}</span>
+</pre>
+
+<p>Offset字段甚至不会在error默认的格式化中出现，但是调用者可以使用它，添加文件和行信息到到error消息中。</p>
+
+<pre><span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">dec</span><span class="pun">.</span><span class="typ">Decode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">val</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">serr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pun">*</span><span class="pln">json</span><span class="pun">.</span><span class="typ">SyntaxError</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">{</span>
+        <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">findLine</span><span class="pun">(</span><span class="pln">f</span><span class="pun">,</span> <span class="pln">serr</span><span class="pun">.</span><span class="typ">Offset</span><span class="pun">)</span>
+        <span class="kwd">return</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%s:%d:%d: %v&#34;</span><span class="pun">,</span> <span class="pln">f</span><span class="pun">.</span><span class="typ">Name</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="pln">line</span><span class="pun">,</span> <span class="pln">col</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
     <span class="pun">}</span>
-    <span class="kwd">return</span> <span class="pln">total</span>
+    <span class="kwd">return</span> <span class="pln">err</span>
 <span class="pun">}</span>
 </pre>
 
-<p>在函数体中,vals被看作是类型为[] int的切片。</p>
+<p>（这是来自Camlistore项目的真实代码的省略的简化版本）
+error接口仅仅需要Error方法；特殊的error实现可能需要其他的方法。例如，net包中返回error类型的错误，遵循了通常的惯例，但是一些error的实现通过net.Error接口定义了其他方法：</p>
 
-<h2>方法</h2>
+<pre><span class="kwd">package</span> <span class="pln">net</span>
 
-<p>尽管没有被大众所接受的明确的OOP的定义，从我们的理解来讲，一个对象其实也就是一个简单的值或者一个变量，在这个对象中会包含一些方法，而一个方法则是一个一个和特殊类型关联的函数。一个面向对象的程序会用方法来表达其属性和对应的操作，这样使用这个对象的用户就不需要直接去操作对象，而是借助方法来做这些事情。</p>
-
-<h3>方法声明</h3>
-
-<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">p</span> <span class="typ">Point</span><span class="pun">)</span> <span class="typ">Distance</span><span class="pun">(</span><span class="pln">q</span> <span class="typ">Point</span><span class="pun">)</span> <span class="kwd">float64</span> <span class="pun">{</span>
-    <span class="kwd">return</span> <span class="pln">math</span><span class="pun">.</span><span class="typ">Hypot</span><span class="pun">(</span><span class="pln">q</span><span class="pun">.</span><span class="typ">X</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">X</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">-</span><span class="pln">p</span><span class="pun">.</span><span class="typ">Y</span><span class="pun">)</span>
+<span class="kwd">type</span> <span class="typ">Error</span> <span class="kwd">interface</span> <span class="pun">{</span>
+    <span class="pln">error</span>
+    <span class="typ">Timeout</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span>   <span class="com">// Is the error a timeout?</span>
+    <span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="kwd">bool</span> <span class="com">// Is the error temporary?</span>
 <span class="pun">}</span>
 </pre>
 
-<p>上面的代码里那个附加的参数p，叫做方法的接收器(receiver)，早期的面向对象语言留下的遗产将调用
-一个方法称为“向一个对象发送消息”。
-在Go语言中，我们并不会像其它语言那样用this或者self作为接收器；我们可以任意的选择接收器的名字。由于接收器的名字经常会被使用到，所以保持其在方法间传递时的一致性和简短性是不错的主意。这里的建议是可以使用其类型的第一个字母，比如这里使用了Point的首字母p。</p>
+<p>客户端代码可以使用类型断言（type assertion）来测试，然后从永久性错误中区分短暂的的网络错误。例如，一个网络爬虫也许会休眠并重试当它遇到一个零时性错误并放弃其他的。</p>
 
-<h2>接口</h2>
+<pre><span class="kwd">if</span> <span class="pln">nerr</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">err</span><span class="pun">.</span><span class="pun">(</span><span class="pln">net</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">ok</span> <span class="pun">&amp;</span><span class="pun">&amp;</span> <span class="pln">nerr</span><span class="pun">.</span><span class="typ">Temporary</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">time</span><span class="pun">.</span><span class="typ">Sleep</span><span class="pun">(</span><span class="dec">1e9</span><span class="pun">)</span>
+    <span class="kwd">continue</span>
+<span class="pun">}</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
 
-<p>在Go语言中，变量总是被一个定义明确的值初始化，即使接口类型也不例外。对于一个接口的零值就是它的类型和值的部分都是nil</p>
+<h3>简化重复的错误处理</h3>
 
-<table>
-<thead>
-<tr>
-<th>field</th>
-<th align="center">value</th>
-</tr>
-</thead>
+<p>在Go中，错误处理非常重要。语言的设计和约定鼓励你在发生错误的时候明确检查错误（和其他语言使用抛出错误并获取错误（ throwing exceptions and sometimes catching them ）的惯例不一样）。在有些情况下，这使你的Go代码冗余，但是幸运的是，你可以使用一些技巧来最少的重复错误处理。
+思考一个使用HTTP处理器的App Engine应用，从数据库中检索一条记录并使用模板格式化。</p>
 
-<tbody>
-<tr>
-<td>type</td>
-<td align="center">nil</td>
-</tr>
+<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">http</span><span class="pun">.</span><span class="typ">HandleFunc</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">viewRecord</span><span class="pun">)</span>
+<span class="pun">}</span>
 
-<tr>
-<td>value</td>
-<td align="center">nil</td>
-</tr>
-</tbody>
-</table>
-
-<p>一个接口值可以持有任意大的动态值。接口值可以使用＝＝和！＝来进行比较。两个接口值相等仅当它们都是nil值或者它们的动态类型相同并且动态值也根据这个动态类型的＝＝操作相等。</p>
-
-<h2>GoRoutines 和 channels</h2>
-
-<h3>Channels</h3>
-
-<p>和map类似，channel也一个对应make创建的底层数据结构的引用。
-复制一个channel或用于函数参数传递时，只是拷贝了一个channel引用，因此调用者和被调用者将引用同一channel对象。和其它的引用类型一样，channel的零值也是nil。
-两个相同类型的channel可以使用==运算符比较。如果两个channel引用的是相通的对象，那么比较的结果为真
-当一个channel被关闭后，再向该channel发送数据将导致panic异常。当一个被关闭的channel中已经发送的数据都被成功接收后，后续的接收操作将不再阻塞，它们会立即返回一个零值。</p>
-
-<h3>不带缓存的Channels</h3>
-
-<p>基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。
-你并不需要关闭每一个channel。只要当需要告诉接收者goroutine，所有的数据已经全部发送时才需要关闭channel。不管一个channel是否被关闭，当它没有被引用时将会被Go语言的垃圾自动回收器回收。（不要将关闭一个打开文件的操作和关闭一个channel操作混淆。对于每个打开的文件，都需要在不使用的使用调用对应的Close方法来关闭文件。）</p>
-
-<h3>基于select的多路复用</h3>
-
-<p>如果多个case同时就绪时，select会随机地选择一个执行，这样来保证每一个channel都有平等的被select的机会。</p>
-
-<pre><span class="kwd">for</span> <span class="pun">{</span>
-    <span class="pln">select</span> <span class="pun">{</span>
-    <span class="kwd">case</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">done</span><span class="pun">:</span>
-        <span class="com">// Drain fileSizes to allow existing goroutines to finish.</span>
-        <span class="kwd">for</span> <span class="pln">range</span> <span class="pln">fileSizes</span> <span class="pun">{</span>
-            <span class="com">// Do nothing.</span>
-        <span class="pun">}</span>
+<span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
         <span class="kwd">return</span>
-    <span class="kwd">case</span> <span class="pln">size</span><span class="pun">,</span> <span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">fileSizes</span><span class="pun">:</span>
-        <span class="com">// ...</span>
+    <span class="pun">}</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
     <span class="pun">}</span>
 <span class="pun">}</span>
 </pre>
 
-<p>在结束之前我们需要把fileSizes channel中的内容“排”空，在channel被关闭之前，舍弃掉所有值。</p>
+<p>这个函数处理由datastore.Get函数和<code>viewTemplate</code>的Execute方法产生的错误。在这两个错误中，它用HTTP状态码500(“Internal Server Error”)来向用户展现一个简单的错误信息。这段代码看起来是可管理的，但是添加了多余的HTTP处理器，并以许多相同的错误处理代码结束。
+为了减少重复，我们可以定义我们自己的HTTP appHandler类型来包含error并返回值。</p>
 
-<h2>基于共享变量的并发</h2>
+<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span>
+</pre>
 
-<h3>竞争条件</h3>
+<p>然后，我们修改我们的viewRecord 函数来返回错误：</p>
 
-<p>一个函数在线性程序中可以正确地工作。如果在并发的情况下，这个函数依然可以正确地工 作的话，那么我们就说这个函数是并发安全的，并发安全的函数不需要额外的同步工作。我们可以把这 个概念概括为一个特定类型的一些方法和操作函数，如果这个类型是并发安全的话，那么所有它的访问 方法和操作就都是并发安全的。
-竞争条件指的是程序在多个goroutine交叉执行操作时，没有给出正确的结果。竞争条件是很恶劣的一种场景，因为这种问题会一直潜伏在你的程序里，然后在非常少见的时候蹦出来
-<strong>数据竞争的定义</strong>：数据竞争会在两个以上的goroutine并发访问相同的变量且至少其中一个为写操作时发生。根据上述定义，有三种方式可以避免数据竞争：
-- 第一种方法是不要去写变量。
-- 第二种避免数据竞争的方法是，避免从多个goroutine访问变量。1. 变量都被限定在了一个单独的goroutine中。 由于其它的goroutine不能够直接访问变量，它们只能使用一个channel来发送给指定的goroutine请求来查询更新变量。这也就是Go的口头禅“不要使用共享数据来通信；使用通信来共享数据”。一个提供对 一个指定的变量通过cahnnel来请求goroutine叫做这个变量的监控(monitor)goroutine。2.即使当一个变量无法在其整个生命周期内被绑定到一个独立的goroutine，绑定依然是并发问题的一个解 决方案。例如在一条流水线上的goroutine之间共享变量是很普遍的行为，在这两者间会通过channel来传输地址信息。（注： 串行channel）
-- 第三种避免数据竞争的方法是允许很多goroutine去访问变量，但是在同一个时刻最多只有一个 goroutine在访问。这种方式被称为“互斥”</p>
+<pre><span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pln">err</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
 
-<h3>Goroutines和线程</h3>
+<p>这和原始的版本相似，但是http包不能理解返回error的函数。为了修正，我们在appHandler上实现了http.Handler接口的ServeHTTP方法：</p>
 
-<p>每一个OS线程都有一个固定大小的内存块(一般会是2MB)来做栈，这个栈会用来存储当前正在被调用或挂 起(指在调用其它函数时)的函数的内部变量。
-一个goroutine会以一个很小的栈开始其生命周期，一般只需要2KB。一个goroutine的栈，和操作 系统线程一样，会保存其活跃或挂起的函数调用的本地变量，但是和OS线程不太一样的是一个goroutine 的栈大小并不是固定的；栈的大小会根据需要动态地伸缩。而goroutine的栈的最大值有1GB，比传统的 固定大小的线程栈要大得多，</p>
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">)</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
 
-<h3>Goroutine调度</h3>
+<p>ServeHTTP方法调用appHandler函数并且向用户显示错误（如果有的话）。注意这个方法的接收者，fn，是一个函数。（Go可以这样做！）方法调用函数通过调用表达式fn(w, r)中的接收者。
+现在，当使用http包注册viewRecord的时候，我们使用Handle函数（而不是HandleFunc）appHandler作为http.Handler（而不是http.HandlerFunc）</p>
 
-<p>OS线程会被操作系统内核调度。每几毫秒，一个硬件计时器会中断处理器，这会调用一个叫作scheduler 的内核函数。这个函数会挂起当前执行的线程并保存内存中它的寄存器内容，检查线程列表并决定下一 次哪个线程可以被运行，并从内存中恢复该线程的寄存器信息，然后恢复执行该线程的现场并开始执行 线程。因为操作系统线程是被内核所调度，所以从一个线程向另一个“移动”需要完整的上下文切换， 也就是说，保存一个用户线程的状态到内存，恢复另一个线程的到寄存器，然后更新调度器的数据结 构。这几步操作很慢，因为其局部性很差需要几次内存访问，并且会增加运行的cpu周期。</p>
+<pre><span class="kwd">func</span> <span class="pln">init</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">http</span><span class="pun">.</span><span class="typ">Handle</span><span class="pun">(</span><span class="str">&#34;/view&#34;</span><span class="pun">,</span> <span class="pln">appHandler</span><span class="pun">(</span><span class="pln">viewRecord</span><span class="pun">)</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
 
-<p>Go的运行时包含了其自己的调度器，这个调度器使用了一些技术手段，比如m:n调度，因为其会在n个操 作系统线程上多工(调度)m个goroutine。Go调度器的工作和内核的调度是相似的，但是这个调度器只关 注单独的Go程序中的goroutine(译注：按程序独立)。
-和操作系统的线程调度不同的是，Go调度器并不是用一个硬件定时器而是被Go语言”建筑”本身进行调度 的。例如当一个goroutine调用了time.Sleep或者被channel调用或者mutex操作阻塞时，调度器会使其进 入休眠并开始执行另一个goroutine直到时机到了再去唤醒第一个goroutine。因为因为这种调度方式不 需要进入内核的上下文，所以重新调度一个goroutine比调度一个线程代价要低得多。</p>
+<p>通过基本架构中的错误处理，我们可以使它更加的用户友好。相比仅仅展示错误的字符串，更好的方法是给用户简单的错误消息并附加适合的HTTP状态码，同时在App Engine开发者控制台记录完整的错误用于调试。
+为了做到这点，我们创建一个appError 结构体，包含一个error类型和一些其他字段</p>
 
-<h2>包和工具</h2>
+<pre><span class="kwd">type</span> <span class="pln">appError</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="typ">Error</span>   <span class="pln">error</span>
+    <span class="typ">Message</span> <span class="pln">string</span>
+    <span class="typ">Code</span>    <span class="kwd">int</span>
+<span class="pun">}</span>
+</pre>
 
-<p>有时候，一个中间的状态可能也是有用的，对于一小部分信任的包是可见的，但并不是对所有调用者都 可见。例如，当我们计划将一个大的包拆分为很多小的更容易维护的子包，但是我们并不想将内部的子 包结构也完全暴露出去。同时，我们可能还希望在内部子包之间共享一些通用的处理包，或者我们只是 想实验一个新包的还并不稳定的接口，暂时只暴露给一些受限制的用户使用。
-为了满足这些需求，Go语言的构建工具对包含internal名字的路径段的包导入路径做了特殊处理。这种 包叫internal包，一个internal包只能被和internal目录有同一个父目录的包所导入。</p>
+<p>接下来，我们修改appHandler类型以便返回*appError值：</p>
+
+<pre><span class="kwd">type</span> <span class="pln">appHandler</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span>
+</pre>
+
+<p>（通常，不使用error，而是使用具体的error类型进行传递的做法是错误的，原因会在<a href="https://golang.org/doc/faq#nil_error">Go FAQ</a>中讨论，不过在这里是正确的，因为ServeHTTP是唯一看到这个值并且使用其内容的地方。）
+ 为了使<code>appHandler</code>的ServeHTTP方法向用户显示<code>appError</code>的消息和正确的HTTP状态码，并向开发者记录完整的Error：</p>
+
+<pre> <span class="kwd">func</span> <span class="pun">(</span><span class="pln">fn</span> <span class="pln">appHandler</span><span class="pun">)</span> <span class="typ">ServeHTTP</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">if</span> <span class="pln">e</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fn</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">e</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span> <span class="com">// e is *appError, not os.Error.</span>
+        <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+        <span class="pln">c</span><span class="pun">.</span><span class="typ">Errorf</span><span class="pun">(</span><span class="str">&#34;%v&#34;</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">)</span>
+        <span class="pln">http</span><span class="pun">.</span><span class="typ">Error</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Message</span><span class="pun">,</span> <span class="pln">e</span><span class="pun">.</span><span class="typ">Code</span><span class="pun">)</span>
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>最后，我们更新viewRecord函数，并使它遇到错误的时候返回更多的上下文：</p>
+
+<pre> <span class="kwd">func</span> <span class="pln">viewRecord</span><span class="pun">(</span><span class="pln">w</span> <span class="pln">http</span><span class="pun">.</span><span class="typ">ResponseWriter</span><span class="pun">,</span> <span class="pln">r</span> <span class="pun">*</span><span class="pln">http</span><span class="pun">.</span><span class="typ">Request</span><span class="pun">)</span> <span class="pun">*</span><span class="pln">appError</span> <span class="pun">{</span>
+    <span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">appengine</span><span class="pun">.</span><span class="typ">NewContext</span><span class="pun">(</span><span class="pln">r</span><span class="pun">)</span>
+    <span class="pln">key</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">NewKey</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="str">&#34;Record&#34;</span><span class="pun">,</span> <span class="pln">r</span><span class="pun">.</span><span class="typ">FormValue</span><span class="pun">(</span><span class="str">&#34;id&#34;</span><span class="pun">)</span><span class="pun">,</span> <span class="dec">0</span><span class="pun">,</span> <span class="kwd">nil</span><span class="pun">)</span>
+    <span class="pln">record</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">new</span><span class="pun">(</span><span class="typ">Record</span><span class="pun">)</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">datastore</span><span class="pun">.</span><span class="typ">Get</span><span class="pun">(</span><span class="pln">c</span><span class="pun">,</span> <span class="pln">key</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Record not found&#34;</span><span class="pun">,</span> <span class="dec">404</span><span class="pun">}</span>
+    <span class="pun">}</span>
+    <span class="kwd">if</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">viewTemplate</span><span class="pun">.</span><span class="typ">Execute</span><span class="pun">(</span><span class="pln">w</span><span class="pun">,</span> <span class="pln">record</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+        <span class="kwd">return</span> <span class="pun">&amp;</span><span class="pln">appError</span><span class="pun">{</span><span class="pln">err</span><span class="pun">,</span> <span class="str">&#34;Can&#39;t display record&#34;</span><span class="pun">,</span> <span class="dec">500</span><span class="pun">}</span>
+    <span class="pun">}</span>
+    <span class="kwd">return</span> <span class="kwd">nil</span>
+<span class="pun">}</span>
+</pre>
+
+<p>这个版本的viewRecord和原始版本的程度相同，但是现在每一行都有特别的意思，并且，我们提供更加友好的用户体验。
+ 这还没结束；我们将会在我们的应用中优化错误处理。一些想法：
+ - 给予每个错误处理一个漂亮的HTML模板
+ - 当用户是管理员时，将stack trace写到HTTP回应中，使debug更加简单
+ - 为appError写一个构建函数，用于存储stack trace，以便调试
+ - 在appHandler中发生panic时recover，将错误作为“危险”写入开发者控制台，并用户“发生了一个严重的错误”。 这是避免向用户暴露由于编程错误引起的不可预测的错误的信息的一个很好的想法。参看<a href="http://golang.org/doc/articles/defer_panic_recover.html">Defer, Panic, and Recover</a> 文章获取更多细节。</p>
+
+<h3>总结</h3>
+
+<p>适合的错误处理是一个好的软件的基本需求。根据本文所讨论的技术，你应该能够写出更可靠且更简洁的Go代码</p>
+
+<p>Andrew Gerrand 著</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/05/Error%20handling%20and%20Go%20%28%e7%bf%bb%e8%af%91%29">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">我的Redis初次实战</h3>
+                <div class="postContent">
+                    <p>因为各种原因，我必须在windows上进行服务器开发，所以我需要在windows上运行redis，即使《redis in action》上明确写着不推荐在windows上使用redis。
+我在windows上使用的redis是从 <a href="https://github.com/dmajkic/redis/downloads">https://github.com/dmajkic/redis/downloads</a> 获取的。
+我使用redis的桌面客户端为Redis Desktop Manager。使用的原因仅仅是第一个搜到的客户端就是他且没有让我讨厌的地方，就继续用了。软件地址<a href="https://redisdesktop.com/download。">https://redisdesktop.com/download。</a>
+极力推荐《redis实战》。从第一章开始，在介绍什么是redis，有什么用，与其他数据库有什么区别之后，就开始从一个项目开始，演示如何使用redis。讲的第一个项目是对文章进行投票，这让我的回忆起我的大学的第一个项目–一个投票系统的实现。
+<!-- more -->
+在看完这一章之后，我对redis有了个初步了解，并将在这一章学到的知识，运用到我的实际工作的一个小项目中：解析短信回执的xml，统计回执中的信息，统计用户的某个活动发送的短信各种状态的数目。解析后的xml数据大致如下</p>
+
+<pre><span class="kwd">type</span> <span class="typ">Message</span> <span class="kwd">struct</span> <span class="pun">{</span>
+    <span class="typ">PhoneNum</span>   <span class="pln">string</span>
+    <span class="typ">State</span>      <span class="pln">string</span>
+    <span class="typ">UserID</span>     <span class="kwd">int</span>
+    <span class="typ">ActivityID</span> <span class="kwd">int</span>
+<span class="pun">}</span>
+</pre>
+
+<p>本项目是解析一个xml文件，得到其中的信息，进行统计，返回统计的结果。本来可以将数据使用Map存储在内存中，等所有的信息统计后，将Map中的信息输出就可以了，但是这个项目以后要扩展成，需要将内存的数据进行持久化处理，定时过期数据和多服务器主从同步数据，所以使用redis无疑是最好的选择。
+我仿造《redis实战》第一章的编程方法，对程序进行了改造。设定了：
+- user集合： 存储接收到的xml中用户id的集合。集合内的元素类似{1,2,3}
+- user_x_acitvity: 存储用户ID为x的活动id的集合，user_1_acitvity集合内的元素类似{1,2,3}
+- user_x_acitvity_y: 存储用户ID为x，活动ID为y的手机号码信息。user_1_acitvity_1集合内的元素类似{“15952010343，DELIVRD”}，元素的值为”phoneNum,status”的组合
+通过user集合找到有哪些用户收到了回执，通过user_x_acitvity记录用户的哪些活动在回执的记录中。并通过user_x_acitvity_y找到属于此活动的手机号码的状态。看完《redis实战》第一章最大的收获就是设定set的名字。可以通过设定set以特定的名字，来索引到特定的信息。
+具体的程序代码在：<a href="https://github.com/qwendy/handleFeedback">https://github.com/qwendy/handleFeedback</a></p>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">rc</span> <span class="pun">*</span><span class="pln">redisContainer</span><span class="pun">)</span> <span class="pln">pushYiMeiXMLData</span><span class="pun">(</span><span class="pln">message</span> <span class="typ">YiMeiMessage</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="pln">activityID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">Seqid</span> <span class="pun">&gt;</span><span class="pun">&gt;</span> <span class="dec">16</span>
+    <span class="pln">userID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">Seqid</span> <span class="pun">-</span> <span class="pun">(</span><span class="pln">activityID</span> <span class="pun">&lt;</span><span class="pun">&lt;</span> <span class="dec">16</span><span class="pun">)</span>
+    <span class="com">// 用户的集合。设置接收到的用户的集合</span>
+    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="str">&#34;user&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
+    <span class="com">// 设置某个用户的活动集合</span>
+    <span class="pln">userActivitySet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user:%d&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
+    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="pln">userActivitySet</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
+    <span class="com">// 活动的手机号码状态集合</span>
+    <span class="pln">activityPhoneSet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user_%d_activity_%d&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
+    <span class="com">// 手机号码和状态</span>
+    <span class="pln">phoneStatus</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;%s,%s&#34;</span><span class="pun">,</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">PhoneNum</span><span class="pun">,</span> <span class="pln">message</span><span class="pun">.</span><span class="typ">State</span><span class="pun">)</span>
+    <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SAdd</span><span class="pun">(</span><span class="pln">activityPhoneSet</span><span class="pun">,</span> <span class="pln">phoneStatus</span><span class="pun">)</span>
+<span class="pun">}</span>
+
+<span class="kwd">func</span> <span class="pun">(</span><span class="pln">rc</span> <span class="pun">*</span><span class="pln">redisContainer</span><span class="pun">)</span> <span class="typ">Print</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+    <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">userID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="str">&#34;user&#34;</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+        <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;user:%s \n&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
+        <span class="pln">userActivitySet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user:%s&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">)</span>
+        <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">activityID</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="pln">userActivitySet</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;activityID:%s  \n&#34;</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
+            <span class="pln">activityPhoneSet</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Sprintf</span><span class="pun">(</span><span class="str">&#34;user_%s_activity_%s&#34;</span><span class="pun">,</span> <span class="pln">userID</span><span class="pun">,</span> <span class="pln">activityID</span><span class="pun">)</span>
+            <span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">phoneStatus</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">rc</span><span class="pun">.</span><span class="pln">client</span><span class="pun">.</span><span class="typ">SMembers</span><span class="pun">(</span><span class="pln">activityPhoneSet</span><span class="pun">)</span><span class="pun">.</span><span class="typ">Val</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+                <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;phoneStatus:%s  &#34;</span><span class="pun">,</span> <span class="pln">phoneStatus</span><span class="pun">)</span>
+            <span class="pun">}</span>
+            <span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;\n&#34;</span><span class="pun">)</span>
+        <span class="pun">}</span>
+
+    <span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>Val() {
+                fmt.Printf(“phoneStatus:%s  “, phoneStatus)
+            }
+            fmt.Printf(”\n”)
+        }</p>
+
+<pre><code>}
+</code></pre>
+
+<p>}
+```</p>
+
+                </div>
+                <a class="ui large button" href="/2016/09/03/%e6%88%91%e7%9a%84Redis%e5%88%9d%e6%ac%a1%e5%ae%9e%e6%88%98">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+            </div>
+        </div>
+
+
+        <div class="ui inverted vertical footer segment">
+            <div class="ui container">
+                <div class="ui stackable inverted divided equal height stackable grid">
+                    <div class="three wide column">
+                        <h4 class="ui inverted header">About</h4>
+                        <div class="ui inverted link list">
+                            <a href="#" class="item">Sitemap</a>
+                            <a href="#" class="item">Contact Us</a>
+                            <a href="#" class="item">Religious Ceremonies</a>
+                            <a href="#" class="item">Gazebo Plans</a>
+                        </div>
+                    </div>
+                    <div class="three wide column">
+                        <h4 class="ui inverted header">Services</h4>
+                        <div class="ui inverted link list">
+                            <a href="#" class="item">Banana Pre-Order</a>
+                            <a href="#" class="item">DNA FAQ</a>
+                            <a href="#" class="item">How To Access</a>
+                            <a href="#" class="item">Favorite X-Men</a>
+                        </div>
+                    </div>
+                    <div class="seven wide column">
+                        <h4 class="ui inverted header">Footer Header</h4>
+                        <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
