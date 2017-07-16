@@ -213,6 +213,11 @@
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 {{end}}
+                <div class="ui large buttons">
+                    <button class="ui button" {{if eq .CurPageUrl .PrePageUrl }} disabled{{end}}><a href="{{.PrePageUrl}}">上一页</a></button>
+                    <div class="or"></div>
+                    <button class="ui button" {{if eq .CurPageUrl .NextPageUrl }} disabled{{end}}><a href="{{.NextPageUrl}}">下一页</a></button>
+                </div>
             </div>
         </div>
 

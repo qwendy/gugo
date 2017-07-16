@@ -115,18 +115,17 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 	lastUrl := fmt.Sprintf("page/%v", allPageNum)
 	min := 0
 	max := hp.NumPerPage * page
-	prePageUrl := ""
-	nextPageUrl := ""
-	curPageUrl := ""
+	prePageUrl := "/"
+	nextPageUrl := fmt.Sprintf("/%v/%v", PAGE_DIR, page+1)
+	curPageUrl := "/"
 	if page != 1 {
 		min = hp.NumPerPage * (page - 1)
-		prePageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page-1)
-		nextPageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page+1)
-		curPageUrl = fmt.Sprintf("%v/%v", PAGE_DIR, page)
+		prePageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, page-1)
+		curPageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, page)
 	}
 	if page == allPageNum {
 		max = len(hp.Posts)
-		nextPageUrl = fmt.Sprintf("page/%v", allPageNum)
+		nextPageUrl = fmt.Sprintf("/%v/%v", PAGE_DIR, allPageNum)
 	}
 	p := hp.Posts[min:max]
 	log.Infof("page:%v,post:%v-%v", page, min, max)
