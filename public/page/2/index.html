@@ -11,6 +11,28 @@
     <title>Homepage - Semantic</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
     <style type="text/css">
+        @font-face {
+            font-family: 'myHan';
+            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
+        }
+        
+        .han {
+            font-weight: normal;
+            font-family: "myHan";
+        }
+        
+        .postContent h1 {
+            font-size: 1.5em;
+        }
+        
+        .postContent h2 {
+            font-size: 1.25em;
+        }
+        
+        .postContent h3 {
+            font-size: 1em;
+        }
+        
         .hidden.menu {
             display: none;
         }
@@ -26,16 +48,6 @@
         
         .masthead .ui.menu .ui.button {
             margin-left: 0.5em;
-        }
-        
-        @font-face {
-            font-family: 'myHan';
-            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
-        }
-        
-        .han {
-            font-weight: normal;
-            font-family: "myHan";
         }
         
         .masthead h1.ui.header {
@@ -204,7 +216,7 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 
-                <h3 class="ui header">（翻译）Sharding-mongo官方文档3.2版本</h3>
+                <h3 class="ui header"><a href="/2016/12/22/%ef%bc%88%e7%bf%bb%e8%af%91%ef%bc%89Sharding-mongo%e5%ae%98%e6%96%b9%e6%96%87%e6%a1%a33.2%e7%89%88%e6%9c%ac">（翻译）Sharding-mongo官方文档3.2版本</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -237,7 +249,7 @@ MongoDb支持通过分片来进行水平扩展。</p>
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">MongoDB-Sharding常用命令</h3>
+                <h3 class="ui header"><a href="/2016/12/22/MongoDB-Sharding%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4">MongoDB-Sharding常用命令</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -282,7 +294,7 @@ sh.enableSharding(&quot;qdgame&quot;)
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">《Go语言圣经》学习小记（2）</h3>
+                <h3 class="ui header"><a href="/2016/12/20/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%882%ef%bc%89">《Go语言圣经》学习小记（2）</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -306,7 +318,7 @@ func Sin(x float64) float //implemented in assembly language
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">mongo数据库sharding学习记录</h3>
+                <h3 class="ui header"><a href="/2016/12/09/mongo%e6%95%b0%e6%8d%ae%e5%ba%93sharding%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95">mongo数据库sharding学习记录</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -329,7 +341,7 @@ func Sin(x float64) float //implemented in assembly language
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">《Go语言圣经》学习小记（1）</h3>
+                <h3 class="ui header"><a href="/2016/12/07/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%881%ef%bc%89">《Go语言圣经》学习小记（1）</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -357,26 +369,6 @@ Go语言的官方博客 <a href="https://blog.golang.org">https://blog.golang.or
             <div class="ui container">
                 <div class="ui stackable inverted divided equal height stackable grid">
                     <div class="three wide column">
-                        <h4 class="ui inverted header">About</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Sitemap</a>
-                            <a href="#" class="item">Contact Us</a>
-                            <a href="#" class="item">Religious Ceremonies</a>
-                            <a href="#" class="item">Gazebo Plans</a>
-                        </div>
-                    </div>
-                    <div class="three wide column">
-                        <h4 class="ui inverted header">Services</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Banana Pre-Order</a>
-                            <a href="#" class="item">DNA FAQ</a>
-                            <a href="#" class="item">How To Access</a>
-                            <a href="#" class="item">Favorite X-Men</a>
-                        </div>
-                    </div>
-                    <div class="seven wide column">
-                        <h4 class="ui inverted header">Footer Header</h4>
-                        <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
                     </div>
                 </div>
             </div>

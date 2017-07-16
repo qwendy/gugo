@@ -11,6 +11,28 @@
     <title>Homepage - Semantic</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
     <style type="text/css">
+        @font-face {
+            font-family: 'myHan';
+            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
+        }
+        
+        .han {
+            font-weight: normal;
+            font-family: "myHan";
+        }
+        
+        .postContent h1 {
+            font-size: 1.5em;
+        }
+        
+        .postContent h2 {
+            font-size: 1.25em;
+        }
+        
+        .postContent h3 {
+            font-size: 1em;
+        }
+        
         .hidden.menu {
             display: none;
         }
@@ -26,16 +48,6 @@
         
         .masthead .ui.menu .ui.button {
             margin-left: 0.5em;
-        }
-        
-        @font-face {
-            font-family: 'myHan';
-            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
-        }
-        
-        .han {
-            font-weight: normal;
-            font-family: "myHan";
         }
         
         .masthead h1.ui.header {
@@ -204,7 +216,7 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 {{ range $key,$post := .Posts}}
-                <h3 class="ui header">{{$post.TemplateData.Meta.Title}}</h3>
+                <h3 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h3>
                 <div class="postContent">
                     {{$post.TemplateData.Overview}}
                 </div>
@@ -226,26 +238,6 @@
             <div class="ui container">
                 <div class="ui stackable inverted divided equal height stackable grid">
                     <div class="three wide column">
-                        <h4 class="ui inverted header">About</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Sitemap</a>
-                            <a href="#" class="item">Contact Us</a>
-                            <a href="#" class="item">Religious Ceremonies</a>
-                            <a href="#" class="item">Gazebo Plans</a>
-                        </div>
-                    </div>
-                    <div class="three wide column">
-                        <h4 class="ui inverted header">Services</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Banana Pre-Order</a>
-                            <a href="#" class="item">DNA FAQ</a>
-                            <a href="#" class="item">How To Access</a>
-                            <a href="#" class="item">Favorite X-Men</a>
-                        </div>
-                    </div>
-                    <div class="seven wide column">
-                        <h4 class="ui inverted header">Footer Header</h4>
-                        <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
                     </div>
                 </div>
             </div>

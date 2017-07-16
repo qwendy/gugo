@@ -11,6 +11,28 @@
     <title>Homepage - Semantic</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
     <style type="text/css">
+        @font-face {
+            font-family: 'myHan';
+            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
+        }
+        
+        .han {
+            font-weight: normal;
+            font-family: "myHan";
+        }
+        
+        .postContent h1 {
+            font-size: 1.5em;
+        }
+        
+        .postContent h2 {
+            font-size: 1.25em;
+        }
+        
+        .postContent h3 {
+            font-size: 1em;
+        }
+        
         .hidden.menu {
             display: none;
         }
@@ -26,16 +48,6 @@
         
         .masthead .ui.menu .ui.button {
             margin-left: 0.5em;
-        }
-        
-        @font-face {
-            font-family: 'myHan';
-            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
-        }
-        
-        .han {
-            font-weight: normal;
-            font-family: "myHan";
         }
         
         .masthead h1.ui.header {
@@ -204,7 +216,7 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 
-                <h3 class="ui header">Error handling and Go (翻译)</h3>
+                <h3 class="ui header"><a href="/2016/12/05/Error%20handling%20and%20Go%20%28%e7%bf%bb%e8%af%91%29">Error handling and Go (翻译)</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -239,7 +251,7 @@ if err != nil {
                     <a href="#">这是分界线哦~~</a>
                 </h4>
                 
-                <h3 class="ui header">我的Redis初次实战</h3>
+                <h3 class="ui header"><a href="/2016/09/03/%e6%88%91%e7%9a%84Redis%e5%88%9d%e6%ac%a1%e5%ae%9e%e6%88%98">我的Redis初次实战</a></h3>
                 <div class="postContent">
                     <hr />
 
@@ -267,26 +279,6 @@ if err != nil {
             <div class="ui container">
                 <div class="ui stackable inverted divided equal height stackable grid">
                     <div class="three wide column">
-                        <h4 class="ui inverted header">About</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Sitemap</a>
-                            <a href="#" class="item">Contact Us</a>
-                            <a href="#" class="item">Religious Ceremonies</a>
-                            <a href="#" class="item">Gazebo Plans</a>
-                        </div>
-                    </div>
-                    <div class="three wide column">
-                        <h4 class="ui inverted header">Services</h4>
-                        <div class="ui inverted link list">
-                            <a href="#" class="item">Banana Pre-Order</a>
-                            <a href="#" class="item">DNA FAQ</a>
-                            <a href="#" class="item">How To Access</a>
-                            <a href="#" class="item">Favorite X-Men</a>
-                        </div>
-                    </div>
-                    <div class="seven wide column">
-                        <h4 class="ui inverted header">Footer Header</h4>
-                        <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
                     </div>
                 </div>
             </div>
