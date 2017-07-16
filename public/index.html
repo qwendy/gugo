@@ -1,1 +1,757 @@
- lec01学习笔记  mongo数据库sharding学习记录  寒衫浮梦-歌词  《Go语言圣经》学习小记（1） 
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    
+    <title>Homepage - Semantic</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
+    <style type="text/css">
+        .hidden.menu {
+            display: none;
+        }
+        
+        .masthead.segment {
+            min-height: 200px;
+            padding: 1em 0em;
+        }
+        
+        .masthead .logo.item img {
+            margin-right: 1em;
+        }
+        
+        .masthead .ui.menu .ui.button {
+            margin-left: 0.5em;
+        }
+        
+        @font-face {
+            font-family: 'myHan';
+            src: URL('/static/fonts/HYGuoQiangXingShuW-1.ttf') format('truetype');
+        }
+        
+        .han {
+            font-weight: normal;
+            font-family: "myHan";
+        }
+        
+        .masthead h1.ui.header {
+            margin-top: 1em;
+            margin-bottom: 0em;
+            font-size: 2.33em;
+        }
+        
+        .masthead h2 {
+            font-size: 1.7em;
+        }
+        
+        .ui.vertical.stripe {
+            padding: 8em 0em;
+        }
+        
+        .ui.vertical.stripe h3 {
+            font-size: 2em;
+        }
+        
+        .ui.vertical.stripe .button+h3,
+        .ui.vertical.stripe p+h3 {
+            margin-top: 3em;
+        }
+        
+        .ui.vertical.stripe .floated.image {
+            clear: both;
+        }
+        
+        .ui.vertical.stripe p {
+            font-size: 1.33em;
+        }
+        
+        .ui.vertical.stripe .horizontal.divider {
+            margin: 3em 0em;
+        }
+        
+        .quote.stripe.segment {
+            padding: 0em;
+        }
+        
+        .quote.stripe.segment .grid .column {
+            padding-top: 5em;
+            padding-bottom: 5em;
+        }
+        
+        .footer.segment {
+            padding: 5em 0em;
+        }
+        
+        .secondary.pointing.menu .toc.item {
+            display: none;
+        }
+        
+        @media only screen and (max-width: 700px) {
+            .ui.fixed.menu {
+                display: none !important;
+            }
+            .secondary.pointing.menu .item,
+            .secondary.pointing.menu .menu {
+                display: none;
+            }
+            .secondary.pointing.menu .toc.item {
+                display: block;
+            }
+            .masthead.segment {
+                min-height: 350px;
+            }
+            .masthead h1.ui.header {
+                font-size: 2em;
+                margin-top: 1.5em;
+            }
+            .masthead h2 {
+                margin-top: 0.5em;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/semantic.js"></script>
+    <script>
+        $(document)
+            .ready(function() {
+
+                
+                $('.masthead')
+                    .visibility({
+                        once: false,
+                        onBottomPassed: function() {
+                            $('.fixed.menu').transition('fade in');
+                        },
+                        onBottomPassedReverse: function() {
+                            $('.fixed.menu').transition('fade out');
+                        }
+                    });
+
+                
+                $('.ui.sidebar')
+                    .sidebar('attach events', '.toc.item');
+
+            });
+    </script>
+</head>
+
+<body>
+
+    
+    <div class="ui large top fixed hidden menu">
+        <div class="ui container nav">
+            <a class="active item">首页</a></a>
+            <a class="item">Category</a>
+            <a class="item">标签</a>
+            <a class="item">About</a>
+            <div class="right item">
+                <div class="ui animated fade button" tabindex="0">
+                    <div class="visible content">赋此间一抹丹砂</div>
+                    <div class="hidden content"><a href="">清狂</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="ui vertical inverted sidebar menu">
+        <a class="active item">首页</a>
+        <a class="item">归档</a>
+        <a class="item">标签</a>
+        <a class="item">关于</a>
+    </div>
+
+
+    
+    <div class="pusher">
+        <div class="ui inverted vertical masthead center aligned segment">
+
+            <div class="ui container">
+                <div class="ui large secondary inverted pointing menu">
+                    <a class="toc item">
+                        <i class="sidebar icon"></i>
+                    </a>
+                    <div class="left item">
+                        <a class="ui inverted button">清 | 狂</a>
+                    </div>
+                    <div class="right item">
+                        <a class="active item">Home</a>
+                        <a class="item">分类</a>
+                        <a class="item">Tags</a>
+                        <a class="item">关于我</a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui text container">
+                <h1 class="ui inverted header">
+                    <span class="han">
+                    不知道为什么，就是要写一句话放这里!
+                    </span>
+                </h1>
+                <h2 class="han">Do whatever you want when you want to.</h2>
+            </div>
+
+        </div>
+
+        <div class="ui vertical stripe segment">
+            <div class="ui text container">
+                
+                <h3 class="ui header">lec01学习笔记</h3>
+                <div class="postContent">
+                    <p>分为: 存储，通讯和计算
+关键点：实现，性能，容错和一致性。一致性和性能不可兼得
+split-brain的意思是A true split brain means multiple systems are online and have accessed an exclusive resource simultaneously</p>
+
+<p>MapReduce： 定义Map和Reduce函数，输入数组形式的数据。</p>
+
+<p>扩展：不互相等待，不共享数据。可并发执行。可单纯的配置更多的计算机来获得更多的吞吐量
+性能：Hard to build a network than can run 1000x faster than a single computer.So they cared about minimizing movement of data over the network.一般会被网络限制。尽量减少数据在网络上传输。
+容错：当Map和Reduce失败时，重新运行。他们仅仅是函数而已–他们不修改输入的内容，不用保存状态，不共享内存，没有Map-Map和Reduce-Reduce的交互。所以重新执行会得到相同的输出。纯函数（pure function）的这个需求是相对于其他并行编程方案的主要限制，也是MR简单的原因。</p>
+
+<p>MapReduce由Mater和Worker组成。Master给workers分配工作，决定worker运行map方法还是reduce方法。当worker执行错误，直接重启worker就好。
+master的调度程序</p>
+
+<pre><span class="kwd">func</span> <span class="pun">(</span><span class="pln">mr</span> <span class="pun">*</span><span class="typ">Master</span><span class="pun">)</span> <span class="pln">schedule</span><span class="pun">(</span><span class="pln">phase</span> <span class="pln">jobPhase</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="kwd">var</span> <span class="pln">ntasks</span> <span class="kwd">int</span>
+	<span class="kwd">var</span> <span class="pln">nios</span> <span class="kwd">int</span> <span class="com">// number of inputs (for reduce) or outputs (for map)</span>
+	<span class="kwd">switch</span> <span class="pln">phase</span> <span class="pun">{</span>
+	<span class="kwd">case</span> <span class="pln">mapPhase</span><span class="pun">:</span>
+		<span class="pln">ntasks</span> <span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">)</span>
+		<span class="pln">nios</span> <span class="pun">=</span> <span class="pln">mr</span><span class="pun">.</span><span class="pln">nReduce</span>
+	<span class="kwd">case</span> <span class="pln">reducePhase</span><span class="pun">:</span>
+		<span class="pln">ntasks</span> <span class="pun">=</span> <span class="pln">mr</span><span class="pun">.</span><span class="pln">nReduce</span>
+		<span class="pln">nios</span> <span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;Schedule: %v %v tasks (%d I/Os)\n&#34;</span><span class="pun">,</span> <span class="pln">ntasks</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">,</span> <span class="pln">nios</span><span class="pun">)</span>
+	<span class="kwd">var</span> <span class="pln">wg</span> <span class="pln">sync</span><span class="pun">.</span><span class="typ">WaitGroup</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">ntasks</span><span class="pun">;</span> <span class="pun">{</span>
+		<span class="pln">wg</span><span class="pun">.</span><span class="typ">Add</span><span class="pun">(</span><span class="dec">1</span><span class="pun">)</span>
+		<span class="pln">go</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">i</span><span class="pun">,</span> <span class="pln">nios</span> <span class="kwd">int</span><span class="pun">,</span> <span class="pln">phase</span> <span class="pln">jobPhase</span><span class="pun">)</span> <span class="pun">{</span>
+			<span class="pln">defer</span> <span class="pln">wg</span><span class="pun">.</span><span class="typ">Done</span><span class="pun">(</span><span class="pun">)</span>
+			<span class="pln">workrName</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">&lt;</span><span class="pun">-</span><span class="pln">mr</span><span class="pun">.</span><span class="pln">registerChannel</span>
+			<span class="kwd">for</span> <span class="kwd">true</span> <span class="pun">{</span>
+				<span class="pln">ok</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">call</span><span class="pun">(</span><span class="pln">workrName</span><span class="pun">,</span> <span class="str">&#34;Worker.DoTask&#34;</span><span class="pun">,</span> <span class="pun">&amp;</span><span class="typ">DoTaskArgs</span><span class="pun">{</span>
+					<span class="typ">JobName</span><span class="pun">:</span>       <span class="pln">mr</span><span class="pun">.</span><span class="pln">jobName</span><span class="pun">,</span>
+					<span class="typ">File</span><span class="pun">:</span>          <span class="pln">mr</span><span class="pun">.</span><span class="pln">files</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span>
+					<span class="typ">Phase</span><span class="pun">:</span>         <span class="pln">phase</span><span class="pun">,</span>
+					<span class="typ">TaskNumber</span><span class="pun">:</span>    <span class="pln">i</span><span class="pun">,</span>
+					<span class="typ">NumOtherPhase</span><span class="pun">:</span> <span class="pln">nios</span><span class="pun">,</span>
+				<span class="pun">}</span><span class="pun">,</span> <span class="kwd">new</span><span class="pun">(</span><span class="kwd">struct</span><span class="pun">{</span><span class="pun">}</span><span class="pun">)</span><span class="pun">)</span>
+				<span class="kwd">if</span> <span class="pln">ok</span> <span class="pun">{</span>
+					<span class="pln">go</span> <span class="kwd">func</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+						<span class="pln">mr</span><span class="pun">.</span><span class="pln">registerChannel</span> <span class="pun">&lt;</span><span class="pun">-</span> <span class="pln">workrName</span>
+					<span class="pun">}</span><span class="pun">(</span><span class="pun">)</span>
+					<span class="kwd">return</span>
+				<span class="pun">}</span>
+			<span class="pun">}</span>
+
+		<span class="pun">}</span><span class="pun">(</span><span class="pln">i</span><span class="pun">,</span> <span class="pln">nios</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">wg</span><span class="pun">.</span><span class="typ">Wait</span><span class="pun">(</span><span class="pun">)</span>
+	<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;Schedule: %v phase done\n&#34;</span><span class="pun">,</span> <span class="pln">phase</span><span class="pun">)</span>
+<span class="pun">}</span>
+</pre>
+
+<p>map方法读入input数据，使用mapF将数据处理之后，将处理后的数据存在指定的中间文件中，中间文件的文件名决定此文件将由哪个reduce执行。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">doMap</span><span class="pun">(</span>
+	<span class="pln">jobName</span> <span class="pln">string</span><span class="pun">,</span> <span class="com">// the name of the MapReduce job</span>
+	<span class="pln">mapTaskNumber</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// which map task this is</span>
+	<span class="pln">inFile</span> <span class="pln">string</span><span class="pun">,</span>
+	<span class="pln">nReduce</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// the number of reduce task that will be run (&#34;R&#34; in the paper)</span>
+	<span class="pln">mapF</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">file</span> <span class="pln">string</span><span class="pun">,</span> <span class="pln">contents</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">[</span><span class="pun">]</span><span class="typ">KeyValue</span><span class="pun">,</span>
+<span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">content</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">ioutil</span><span class="pun">.</span><span class="typ">ReadFile</span><span class="pun">(</span><span class="pln">inFile</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;read input file content &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">kvs</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">mapF</span><span class="pun">(</span><span class="pln">inFile</span><span class="pun">,</span> <span class="pln">string</span><span class="pun">(</span><span class="pln">content</span><span class="pun">)</span><span class="pun">)</span>
+	<span class="pln">files</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="pun">*</span><span class="pln">os</span><span class="pun">.</span><span class="typ">File</span><span class="pun">{</span><span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">nReduce</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+		<span class="pln">fileName</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">reduceName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">mapTaskNumber</span><span class="pun">,</span> <span class="pln">i</span><span class="pun">)</span>
+		<span class="pln">file</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Create</span><span class="pun">(</span><span class="pln">fileName</span><span class="pun">)</span>
+		<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+			<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Create File&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="pun">}</span>
+		<span class="pln">defer</span> <span class="pln">file</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+		<span class="pln">files</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">files</span><span class="pun">,</span> <span class="pln">file</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">kv</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">kvs</span> <span class="pun">{</span>
+		<span class="pln">e</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewEncoder</span><span class="pun">(</span><span class="pln">files</span><span class="pun">[</span><span class="kwd">int</span><span class="pun">(</span><span class="pln">ihash</span><span class="pun">(</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">)</span><span class="pun">)</span><span class="pun">%</span><span class="pln">nReduce</span><span class="pun">]</span><span class="pun">)</span>
+		<span class="pln">e</span><span class="pun">.</span><span class="typ">Encode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">kv</span><span class="pun">)</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>reduce读取指定的中间文件，使用reduceF处理后，输出结果。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">doReduce</span><span class="pun">(</span>
+	<span class="pln">jobName</span> <span class="pln">string</span><span class="pun">,</span> <span class="com">// the name of the whole MapReduce job</span>
+	<span class="pln">reduceTaskNumber</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// which reduce task this is</span>
+	<span class="pln">nMap</span> <span class="kwd">int</span><span class="pun">,</span> <span class="com">// the number of map tasks that were run (&#34;M&#34; in the paper)</span>
+	<span class="pln">reduceF</span> <span class="kwd">func</span><span class="pun">(</span><span class="pln">key</span> <span class="pln">string</span><span class="pun">,</span> <span class="pln">values</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pln">string</span><span class="pun">,</span>
+<span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">kvMap</span> <span class="pun">:</span><span class="pun">=</span> <span class="kwd">make</span><span class="pun">(</span><span class="kwd">map</span><span class="pun">[</span><span class="pln">string</span><span class="pun">]</span><span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span>
+
+	<span class="com">// 读取同一个 reduce task 下的所有文件，保存至哈希表</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">nMap</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+		<span class="pln">filename</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">reduceName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">reduceTaskNumber</span><span class="pun">)</span>
+		<span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="pln">filename</span><span class="pun">)</span>
+		<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+			<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Open File Err: &#34;</span><span class="pun">,</span> <span class="pln">filename</span><span class="pun">)</span>
+		<span class="pun">}</span>
+		<span class="pln">defer</span> <span class="pln">f</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+		<span class="pln">decoder</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewDecoder</span><span class="pun">(</span><span class="pln">f</span><span class="pun">)</span>
+		<span class="kwd">var</span> <span class="pln">kv</span> <span class="typ">KeyValue</span>
+		<span class="kwd">for</span> <span class="pln">decoder</span><span class="pun">.</span><span class="typ">More</span><span class="pun">(</span><span class="pun">)</span> <span class="pun">{</span>
+			<span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">decoder</span><span class="pun">.</span><span class="typ">Decode</span><span class="pun">(</span><span class="pun">&amp;</span><span class="pln">kv</span><span class="pun">)</span>
+			<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+				<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Json decode failed, &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+			<span class="pun">}</span>
+			<span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">kv</span><span class="pun">.</span><span class="typ">Value</span><span class="pun">)</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+
+	<span class="com">// 对= nil {</span>
+				<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Json decode failed, &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+			<span class="pun">}</span>
+			<span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">kvMap</span><span class="pun">[</span><span class="pln">kv</span><span class="pun">.</span><span class="typ">Key</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">kv</span><span class="pun">.</span><span class="typ">Value</span><span class="pun">)</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+
+	<span class="com">// 对哈希表所有 key 进行升序排序</span>
+	<span class="pln">keys</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">{</span><span class="pun">}</span>
+	<span class="kwd">for</span> <span class="pln">k</span><span class="pun">,</span> <span class="pln">_</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">kvMap</span> <span class="pun">{</span>
+		<span class="pln">keys</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">keys</span><span class="pun">,</span> <span class="pln">k</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">sort</span><span class="pun">.</span><span class="typ">Strings</span><span class="pun">(</span><span class="pln">keys</span><span class="pun">)</span>
+	<span class="pln">mergeFile</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Create</span><span class="pun">(</span><span class="pln">mergeName</span><span class="pun">(</span><span class="pln">jobName</span><span class="pun">,</span> <span class="pln">reduceTaskNumber</span><span class="pun">)</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="str">&#34;Create Merge File Err: &#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+	<span class="pun">}</span>
+	<span class="pln">defer</span> <span class="pln">mergeFile</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+	<span class="pln">encoder</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">json</span><span class="pun">.</span><span class="typ">NewEncoder</span><span class="pun">(</span><span class="pln">mergeFile</span><span class="pun">)</span>
+	<span class="kwd">for</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">k</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">keys</span> <span class="pun">{</span>
+		<span class="pln">encoder</span><span class="pun">.</span><span class="typ">Encode</span><span class="pun">(</span><span class="typ">KeyValue</span><span class="pun">{</span><span class="pln">k</span><span class="pun">,</span> <span class="pln">reduceF</span><span class="pun">(</span><span class="pln">k</span><span class="pun">,</span> <span class="pln">kvMap</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span><span class="pun">)</span><span class="pun">}</span><span class="pun">)</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>(课程),<a href="实验的代码">https://github.com/qwendy/Distributed-Systems/tree/master/Lec01_Introduction</a>[<a href="https://github.com/qwendy/Distributed-Systems/tree/master/6.824/src/mapreduce">https://github.com/qwendy/Distributed-Systems/tree/master/6.824/src/mapreduce</a>]</p>
+
+                </div>
+                <a class="ui large button" href="/2017/06/28/lec01%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">mongo数据库sharding学习记录</h3>
+                <div class="postContent">
+                    <p>参考文章：<a href="http://www.runoob.com/mongodb/mongodb-sharding.html">http://www.runoob.com/mongodb/mongodb-sharding.html</a></p>
+
+<p>windows系统。mongo3.2版本</p>
+
+<p>建立目录s0,s1,log,config</p>
+
+<p>步骤一：启动Shard Server</p>
+
+<pre><code>.\bin\mongod.exe --port 27100 --dbpath=.\mongos\s0 --logpath=.\mongos\log\s0.log --logappend --journal --storageEngine=mmapv1 --shardsvr
+
+.\bin\mongod.exe --port 27101 --dbpath=.\mongos\s1 --logpath=.\mongos\log\s1.log --logappend --journal --storageEngine=mmapv1 --shardsvr
+</code></pre>
+
+<p>步骤二： 启动Config Server</p>
+
+<pre><code>.\bin\mongod.exe --port 27200 --dbpath=.\mongos\config --logpath=.\mongos\log\config.log --logappend --journal --storageEngine=mmapv1 --configsvr
+</code></pre>
+
+<p>步骤三： 启动Route Process</p>
+
+<pre><code>.\bin\mongos.exe --port 40000 --configdb localhost:27200  --logpath=.\mongos\log\router.log --chunkSize 1
+</code></pre>
+
+<p>注意:
+1. 我这里不加–configsvr就出现Surprised to discover that localhost:27200 does not believe it is a config server错误。
+2. chunkSize太大的话，会导致插入很多很多数据后才分片。一开始没注意，以为设置错误没有分片。。。chunkSize以M为单位。</p>
+
+<p>步骤四： 配置Sharding</p>
+
+<ul>
+<li><p>连接路由服务器</p>
+
+<pre><code>.\bin\mongo.exe admin --port 40000
+</code></pre></li>
+
+<li><p>设置分片服务器</p>
+
+<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:40000&#34; })
+或者
+sh.addShard(&#34;127.0.0.1:27100&#34;)
+</code></pre></li>
+
+<li><p>设置要分片的数据库</p>
+
+<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
+或者：
+sh.enableSharding(&#34;qdgame&#34;)
+</code></pre></li>
+
+<li><p>关闭balancing</p>
+
+<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+
+<li><p>设置分片collection的index</p>
+
+<pre><code>use qdgame
+db.backpack.ensureIndex({usrid:1,id:1})
+</code></pre></li>
+
+<li><p>设置要分片的collection</p>
+
+<pre><code>db.runCommand({ shardcollection: &#34;qdgame.backpack&#34;, key: { usrid:1, id:1}})
+或者
+sh.shardCollection(&#34;qdgame.backpack&#34;,{usrid:1, id:1})
+</code></pre></li>
+
+<li><p>开启balancing</p>
+
+<pre><code>sh.enableBalancing(&#34;qdgame.backpack&#34;)
+</code></pre></li>
+</ul>
+
+<p>注意：设置一定要在admin数据库下。
+e.backpack”,{usrid:1, id:1})</p>
+
+<pre><code>
+- 开启balancing
+</code></pre>
+
+<p>sh.enableBalancing(“qdgame.backpack”)
+```</p>
+
+<p>注意：设置一定要在admin数据库下。</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/09/mongo%e6%95%b0%e6%8d%ae%e5%ba%93sharding%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">寒衫浮梦-歌词</h3>
+                <div class="postContent">
+                    <h1>寒衫浮梦</h1>
+
+<p>笔落书卷半</p>
+
+<p>细呷温酒纸墨香</p>
+
+<p>迹痕潦潦 聆风旖旎</p>
+
+<p>画浮生一纸水青 未干</p>
+
+<p>念转凌霄权</p>
+
+<p>御笔不点寒白衫</p>
+
+<p>拂袖河山 纵笔江川</p>
+
+<p>赋此间一抹丹砂 清狂</p>
+
+<p>兰亭袅袅入凡尘</p>
+
+<p>行书以鉴当琼月</p>
+
+<p>锋毫冽冽提宫阙</p>
+
+<p>白绢为约伊人决</p>
+
+<p>苍鸟扶之青云兮</p>
+
+<p>青冢暮而依别离</p>
+
+<p>羁鹰坠羽寻芜兮</p>
+
+<p>封笔沉沙以伴渺娉</p>
+
+<p>伏案倾旧卷</p>
+
+<p>恍若入梦琴瑟婉</p>
+
+<p>尘中千叹 何人语堪</p>
+
+<p>惟作一介寒衫旧 轻叩</p>
+
+<p>清冽酒坛散</p>
+
+<p>一梦惊世长安仙</p>
+
+<p>浅吟轻唱 对错何妨</p>
+
+<p>唯记一点荧光青 微凉</p>
+
+<p>兰亭袅袅入凡尘</p>
+
+<p>行书以鉴当琼月</p>
+
+<p>锋毫冽冽提宫阙</p>
+
+<p>白绢为约伊人决</p>
+
+<p>苍鸟扶之青云兮</p>
+
+<p>青冢暮而依别离</p>
+
+<p>羁鹰坠羽寻芜兮</p>
+
+<p>封笔沉沙以伴娉婷</p>
+
+<p>渚江清清曳纸莲</p>
+
+<p>以寄天方姝旧还</p>
+
+<p>燕谷轻轻拙荆唤</p>
+
+<p>传以九幽何回荡</p>
+
+<p>倦眉蹙之终南兮</p>
+
+<p>风动玲心而愁忆</p>
+
+<p>悴鬓不觉缃素兮</p>
+
+<p>沧山映水流年何必</p>
+
+<p>终不见蛾眉轻舞霓裳 流袖翩跹��</p>
+
+<p>风动玲心而愁忆</p>
+
+<p>悴鬓不觉缃素兮</p>
+
+<p>沧山映水流年何必</p>
+
+<p>终不见蛾眉轻舞霓裳 流袖翩跹</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/26/%e5%af%92%e8%a1%ab%e6%b5%ae%e6%a2%a6-%e6%ad%8c%e8%af%8d">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+                <h3 class="ui header">《Go语言圣经》学习小记（1）</h3>
+                <div class="postContent">
+                    <p>记录《Go语言圣经》学习笔记。（实为划重点）</p>
+
+<p>顺序通信进程 （ communicating sequential processes ，缩写为CSP）。在CSP中，程序是一组中间没有共享状态的平行运行的处理过程，它们之间使用管道进行通信和控制同步。
+Go语言的官方博客 <a href="https://blog.golang.org">https://blog.golang.org</a> 会不定期发布一些Go语言最好的实践文章，包括当前语言的发展状态、未来 的计划、会议报告和Go语言相关的各种会议的主题等信息（译注： <a href="http://talks.golang.org/">http://talks.golang.org/</a> 包含了 官方收录的各种报告的讲稿）。
+<!-- more --></p>
+
+<h3>第一章 入门</h3>
+
+<p>对map进行range循环时，其迭代顺序是不确定的，从实践来看，很可能每次运行都会有不一样的结果（译注：这是Go语言的设计者有意为之的，因为其底层实现不保证插入顺序和遍历顺序一致，也希望程序员不要依赖遍历时的顺序，所以干脆直接在遍历的时候做了随机化处理，醉了。补充：好像说随机序可以防止某种类型的攻击，虽然不太明白，但是感觉还蛮厉害的），来避免程序员在业务中依赖遍历时的顺序。
+map是用make函数创建的数据结构的一个<strong>引用</strong>。当一个map被作为参数传递给一个函数时，函数接收到的是一份<strong>引用的拷贝</strong>，虽然本身并不是一个东西，但因为他们指向的是同一块数据对象（译注：类似于C++里的引用传递，实际上指针是另一个指针了，但内部存的值指向同一块内存），所以你在函数里对map里的值进行修改时，原始的map内的值也会改变。</p>
+
+<h3>第二章 程序结构</h3>
+
+<p>如果初始化表达式被省略，那么将用零值初始化该变量。 数值类型变量对应的零值是0，布尔类型变量对应的零值是false，字符串类型对应的零值是空字符串，接口或引用类型（包括slice、map、chan和函数）变量对应的零值是nil。数组或结构体等聚合类型对应的零值是每个元素或字段都是对应该类型的零值。
+var形式的声明语句往往是用于需要显式指定变量类型地方，或者因为变量稍后会被重新赋值而初始值无关紧要的地方。
+任何类型的指针的零值都是nil。。如果p != nil测试为真，那么p是指向某个有效变量。指针之间也是可以进行相等测试的，只有当它们指向同一个变量或全部是nil时才相等。
+每次调用new函数都是返回一个新的变量的地址，当然也可能有特殊情况：如果两个类型都是空的，也就是说类型的大小是0，例如struct{}和 [0]int,有可能有相同的地址（依赖具体的语言实现）（译注：请谨慎使用大小为0的类型，因为如果类型的大小为0的话，可能导致Go语言的自动垃圾回收器有不同的行为，具体请查看runtime.SetFinalizer函数相关文档）。</p>
+
+<h3>第三章 基础数据类型</h3>
+
+<p>一个字符串是一个不可改变的字节序列。内置的len函数可以返回一个字符串中的字节数目（不是rune字符数目），索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束。字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串：</p>
+
+<pre><span class="pln">s</span> <span class="pun">:</span><span class="pun">=</span> <span class="str">&#34;left foot&#34;</span>
+<span class="pln">t</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">s</span>
+<span class="pln">s</span> <span class="pun">+</span><span class="pun">=</span> <span class="str">&#34;, right foot&#34;</span>
+</pre>
+
+<p>这并不会导致原始的字符串值被改变，但是变量s将因为+=语句持有一个新的字符串值，但是t依然是包含原先的字符串值。
+Go语言的常量有个不同寻常之处。虽然一个常量可以有任意有一个确定的基础类型，例如int或float64，或者是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类�是类似time.Duration这样命名的基础类型，但是许多常量并没有一个明确的基础类型。编译器为这些没有明确的基础类型的数字常量提供比基础类型更高精度的算术运算。
+无类型的常量不仅可以提供更高的运算精度，而且可以直接用于更多的表达式而不需要显式的类型转换。
+例如math包中的Pi常量：</p>
+
+<pre>	<span class="typ">Pi</span>  <span class="pun">=</span> <span class="dec">3.14159265358979323846264338327950288419716939937510582097494459</span> <span class="com">//http://oeis.org/A000796</span>
+</pre>
+
+<h3>第四章 符合数据类型</h3>
+
+<h4>数组</h4>
+
+<p>在数组字面值中，如果在数组的长度位置出现的是“…”省略号，则表示数组的长度是根据初始化值的个数来计算。数组的长度必须是常量表达式，因为数组的长度需要在编译阶段确定。</p>
+
+<pre><span class="pln">q</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;%T\n&#34;</span><span class="pun">,</span> <span class="pln">q</span><span class="pun">)</span> <span class="com">// &#34;[3]int&#34;</span>
+</pre>
+
+<p>也可以指定一个索引和对应值列表的方式初始化，就像下面这样：</p>
+
+<pre><span class="kwd">type</span> <span class="typ">Currency</span> <span class="kwd">int</span>
+
+<span class="kwd">const</span> <span class="pun">(</span>
+	<span class="typ">USD</span> <span class="typ">Currency</span> <span class="pun">=</span> <span class="pln">iota</span> <span class="com">// 美元</span>
+	<span class="typ">EUR</span>                 <span class="com">// 欧元</span>
+	<span class="typ">GBP</span>                 <span class="com">// 英镑</span>
+	<span class="typ">RMB</span>                 <span class="com">// 人民币</span>
+<span class="pun">)</span>
+<span class="pln">symbol</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="pln">string</span><span class="pun">{</span><span class="typ">USD</span><span class="pun">:</span> <span class="str">&#34;$&#34;</span><span class="pun">,</span> <span class="typ">EUR</span><span class="pun">:</span> <span class="str">&#34;€&#34;</span><span class="pun">,</span> <span class="typ">GBP</span><span class="pun">:</span> <span class="str">&#34;￡&#34;</span><span class="pun">,</span> <span class="typ">RMB</span><span class="pun">:</span> <span class="str">&#34;￥&#34;</span><span class="pun">}</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="typ">RMB</span><span class="pun">,</span> <span class="pln">symbol</span><span class="pun">[</span><span class="typ">RMB</span><span class="pun">]</span><span class="pun">)</span> <span class="com">// &#34;3 ￥&#34;</span>
+</pre>
+
+<p>如果一个数组的元素类型是可以相互比较的，那么数组类型也是可以相互比较的，这时候我们可以直接通过==比较运算符来比较两个数组，只有当两个数组的所有元素都是相等的时候数组才是相等的。不相等比较运算符!=遵循同样的规则。(斩风注: 这里的比较仅指相等和不等。<strong>大于小于不包含在此类</strong>，<strong>数组长度类型必须相同</strong>)</p>
+
+<pre><span class="pln">a</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
+<span class="pln">b</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
+<span class="pln">c</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">2</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">3</span><span class="pun">}</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">b</span><span class="pun">,</span> <span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">,</span> <span class="pln">b</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">c</span><span class="pun">)</span> <span class="com">// &#34;true false false&#34;</span>
+<span class="pln">d</span> <span class="pun">:</span><span class="pun">=</span> <span class="pun">[</span><span class="dec">3</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="dec">1</span><span class="pun">,</span> <span class="dec">2</span><span class="pun">}</span>
+<span class="pln">fmt</span><span class="pun">.</span><span class="typ">Println</span><span class="pun">(</span><span class="pln">a</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">d</span><span class="pun">)</span> <span class="com">// compile error: cannot compare [2]int == [3]int</span>
+</pre>
+
+<h4>slice</h4>
+
+<p>一个slice是一个轻量级的数据结构，提供了访问数组子序列（或者全部）元素的功能，而且slice的底层确实引用一个数组对象。一个slice由三个部分构成：指针、长度和容量。指针指向第一个slice元素对应的底层数组元素的地址，要注意的是slice的第一个元素并不一定就是数组的第一个元素。（斩风注：slice可能是数组的中间部分。）长度对应slice中元素的数目；长度不能超过容量，容量一般是从slice的开始位置到底层数据的结尾位置。内置的len和cap函数分别返回slice的长度和容量。
+复制一个slice只是对底层的数组创建了一个新的slice别名。
+和数组不同的是，slice之间不能比较，因此我们不能使用==操作符来判断两个slice是否含有全部相等元素。不过标准库提供了高度优化的bytes.Equal函数来判断两个字节型slice是否相等（[]byte），但是对于其他类型的slice，我们必须自己展开每个元素进行比较。
+一个零值的slice等于nil。一个nil值的slice并没有底层数组。一个nil值的slice的长度和容量都是0，但是也有非nil值的slice的长度和容量也是0的，例如[]int{}或make([]int, 3)[3:]。与任意类型的nil值一样，我们可以用[]int(nil)类型转换表达式来生成一个对应类型slice的nil值。</p>
+
+<pre><span class="kwd">var</span> <span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span>    <span class="com">// len(s) == 0, s == nil</span>
+<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">nil</span>        <span class="com">// len(s) == 0, s == nil</span>
+<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">(</span><span class="kwd">nil</span><span class="pun">)</span> <span class="com">// len(s) == 0, s == nil</span>
+<span class="pln">s</span> <span class="pun">=</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">{</span><span class="pun">}</span>    <span class="com">// len(s) == 0, s != nil</span>
+</pre>
+
+<p>如果你需要测试一个slice是否是空的，使用len(s) == 0来判断，而不应该用s == nil来判断。
+内置的append函数可能使用比appendInt更复杂的内存扩展策略。因此，通常我们并不知道append调用是否导致了内存的重新分配，因此我们也不能确认新的slice和原始的slice是否引用的是相同的底层数组空间。同样，我们不能确认在原先的slice上的操作是否会影响到新的slice。因此，通常是将append返回的结果直接赋值给输入的slice变量。</p>
+
+<p>练习 4.3： 重写reverse函数，使用数组指针代替slice。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">reverseV2</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">*</span><span class="pun">[</span><span class="dec">10</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="kwd">for</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">,</span> <span class="dec">9</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">j</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">,</span> <span class="pln">j</span> <span class="pun">=</span> <span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">,</span> <span class="pln">j</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
+		<span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span> <span class="pun">=</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">j</span><span class="pun">]</span><span class="pun">,</span> <span class="pun">(</span><span class="pun">*</span><span class="pln">s</span><span class="pun">)</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>练习 4.4： 编写一个rotate函数，通过一次循环完成镟转。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">forwardRotate</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="kwd">int</span><span class="pun">,</span> <span class="pln">x</span> <span class="kwd">int</span><span class="pun">)</span> <span class="pun">{</span>
+	<span class="pln">mid</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">x</span>
+	<span class="pln">k</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">mid</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="dec">0</span><span class="pun">;</span> <span class="pln">i</span> <span class="pun">&lt;</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">;</span> <span class="pln">i</span><span class="pun">+</span><span class="pun">+</span> <span class="pun">{</span>
+		<span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span> <span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">k</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span>
+		<span class="pln">k</span><span class="pun">+</span><span class="pun">+</span>
+		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">mid</span> <span class="pun">{</span>
+			<span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
+				<span class="kwd">return</span>
+			<span class="pun">}</span>
+			<span class="pln">mid</span> <span class="pun">=</span> <span class="pln">k</span>
+		<span class="pun">}</span> <span class="kwd">else</span> <span class="kwd">if</span> <span class="pln">k</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span> <span class="pun">{</span>
+			<span class="pln">k</span> <span class="pun">=</span> <span class="pln">mid</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+<span class="pun">}</span>
+</pre>
+
+<p>练习 4.5： 写一个函数在原地完成消除[]string中相邻重复的字符串的操作。</p>
+
+<pre><span class="kwd">func</span> <span class="pln">noRepeatSide</span><span class="pun">(</span><span class="pln">s</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span><span class="pun">)</span> <span class="pun">[</span><span class="pun">]</span><span class="pln">string</span> <span class="pun">{</span>
+	<span class="pln">count</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span>
+	<span class="kwd">for</span> <span class="pln">i</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">range</span> <span class="pln">s</span> <span class="pun">{</span>
+		<span class="kwd">if</span> <span class="pln">i</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">len</span><span class="pun">(</span><span class="pln">s</span><span class="pun">)</span><span class="pun">-</span><span class="dec">1</span> <span class="pun">{</span>
+			<span class="kwd">return</span> <span class="pln">s</span>
+		<span class="pun">}</span>
+		<span class="kwd">if</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">]</span> <span class="pun">=</span><span class="pun">=</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">]</span> <span class="pun">{</span>
+			<span class="pln">s</span> <span class="pun">=</span> <span class="kwd">append</span><span class="pun">(</span><span class="pln">s</span><span class="pun">[</span><span class="pun">:</span><span class="pln">i</span><span class="pun">]</span><span class="pun">,</span> <span class="pln">s</span><span class="pun">[</span><span class="pln">i</span><span class="pun">+</span><span class="dec">1</span><span class="pun">:</span><span class="pun">]</span><span class="pun">.</span><span class="pun">.</span><span class="pun">.</span><span class="pun">)</span>
+			<span class="pln">count</span><span class="pun">-</span><span class="pun">-</span>
+		<span class="pun">}</span>
+	<span class="pun">}</span>
+	<span class="kwd">return</span> <span class="pln">s</span>
+<span class="pun">}</span>
+</pre>
+
+<h4>Map</h4>
+
+<p>虽然浮点数类型也是支持相等运算符比较的，但是将浮点数用做key类型则是一个坏的想法，正如第三章提到的，最坏的情况是可能出现的NaN和任何浮点数都不相等。对于V对应的value数据类型则没有任何的限制.
+map中的元素并不是一个变量，因此我们不能对map的元素进行取址操作.
+map上的大部分操作，包括查找、删除、len和range循环都可以安全工作在nil值的map上，它们的行为和一个空的map类似。但是向一个nil值的map存入元素将导致一个panic异常.在向map存数据前必须先创建map。
+和slice一样，map之间也不能进行相等比较；唯一的例外是和nil进行比较。要判断两个map是否包含相同的key和value，我们必须通过一个循环实现.
+如果结构体的全部成员都是可以比较的，那么结构体也是可以比较的，那样的话两个结构体将可以使用==或!=运算符进行比较.
+Go语言有一个特性让我们只声明一个成员对应的数据类型而不指名成员的名字；这类成员就叫匿名成员。匿名成员的数据类型必须是命名的类型或指向一个命名的类型的指针。下面的代码中，Circle和Wheel各自都有一个匿名成员。我们可以说Point类型被嵌入到了Circle结构体，同时Circle类型被嵌入到了Wheel结构体。</p>
+
+<pre><span class="kwd">type</span> <span class="typ">Circle</span> <span class="kwd">struct</span> <span class="pun">{</span>
+<span class="typ">Point</span>
+<span class="typ">Radius</span> <span class="kwd">int</span>
+<span class="pun">}</span>
+<span class="kwd">type</span> <span class="typ">Wheel</span> <span class="kwd">struct</span> <span class="pun">{</span>
+<span class="typ">Circle</span>
+<span class="typ">Spokes</span> <span class="kwd">int</span>
+<span class="pun">}</span>
+</pre>
+
+<p>得益于匿名嵌入的特性，我们可以直接访问叶子属性而不需要给出完整的路径：</p>
+
+<pre><span class="kwd">var</span> <span class="pln">w</span> <span class="typ">Wheel</span>
+<span class="pln">w</span><span class="pun">.</span><span class="typ">X</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.X = 8</span>
+<span class="pln">w</span><span class="pun">.</span><span class="typ">Y</span> <span class="pun">=</span> <span class="dec">8</span> <span class="com">// equivalent to w.Circle.Point.Y = 8</span>
+<span class="pln">w</span><span class="pun">.</span><span class="typ">Radius</span> <span class="pun">=</span> <span class="dec">5</span> <span class="com">// equivalent to w.Circle.Radius = 5</span>
+<span class="pln">w</span><span class="pun">.</span><span class="typ">Spokes</span> <span class="pun">=</span> <span class="dec">20</span>
+</pre>
+
+<p>为什么要嵌入一个没有任何子成员类型的匿名成员类型呢？答案是<code>匿名类型的方法集</code>。简短的点运算符语法可以用于选择匿名成员嵌套的成员，<strong>也可以用于访问它们的方法</strong>。实际上，外层的结构体不仅仅是获得了匿名成员类型的所有成员，而且也获得了该类型导出的全部的方法。这个机制可以用于将一个有简单行为的对象组合成有复杂行为的对象。<strong>组合</strong>是Go语言中面向对象编程的核心.</p>
+
+                </div>
+                <a class="ui large button" href="/2016/12/07/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%881%ef%bc%89">Read More</a>
+                <h4 class="ui horizontal header divider">
+                    <a href="#">这是分界线哦~~</a>
+                </h4>
+                
+            </div>
+        </div>
+
+
+        <div class="ui inverted vertical footer segment">
+            <div class="ui container">
+                <div class="ui stackable inverted divided equal height stackable grid">
+                    <div class="three wide column">
+                        <h4 class="ui inverted header">About</h4>
+                        <div class="ui inverted link list">
+                            <a href="#" class="item">Sitemap</a>
+                            <a href="#" class="item">Contact Us</a>
+                            <a href="#" class="item">Religious Ceremonies</a>
+                            <a href="#" class="item">Gazebo Plans</a>
+                        </div>
+                    </div>
+                    <div class="three wide column">
+                        <h4 class="ui inverted header">Services</h4>
+                        <div class="ui inverted link list">
+                            <a href="#" class="item">Banana Pre-Order</a>
+                            <a href="#" class="item">DNA FAQ</a>
+                            <a href="#" class="item">How To Access</a>
+                            <a href="#" class="item">Favorite X-Men</a>
+                        </div>
+                    </div>
+                    <div class="seven wide column">
+                        <h4 class="ui inverted header">Footer Header</h4>
+                        <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

@@ -20,21 +20,19 @@ import (
 )
 
 type Post struct {
-	SourcePath  string
-	sourceData  []byte
-	Destination string // the folder to create directory and html file
-	Location    string // the location(directory) of the html file
-	htmlData    []byte
-	Meta        *Meta
-	Template    *template.Template
+	SourcePath   string
+	sourceData   []byte
+	Destination  string // the folder to create directory and html file
+	Location     string // the location(directory) of the html file
+	htmlData     []byte
+	Meta         *Meta
+	Template     *template.Template
+	TemplateData *PostTemplateData
 }
 
 type PostTemplateData struct {
-	Title      string
-	Date       string
-	Tags       []string
-	Categories []string
-	Content    template.HTML
+	Meta    *Meta
+	Content template.HTML
 }
 type Meta struct {
 	Title      string
@@ -158,14 +156,11 @@ func (p *Post) Generate() (err error) {
 	}
 	defer f.Close()
 	writer := bufio.NewWriter(f)
-	td := PostTemplateData{
-		Title:      p.Meta.Title,
-		Date:       p.Meta.Date,
-		Tags:       p.Meta.Tags,
-		Categories: p.Meta.Category,
-		Content:    template.HTML(string(p.htmlData)),
+	p.TemplateData = &PostTemplateData{
+		Meta:    p.Meta,
+		Content: template.HTML(string(p.htmlData)),
 	}
-	if err := p.Template.Execute(writer, td); err != nil {
+	if err := p.Template.Execute(writer, p.TemplateData); err != nil {
 		return fmt.Errorf("Executing template Error: %v", err)
 	}
 	if err := writer.Flush(); err != nil {

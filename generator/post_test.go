@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewPost(t *testing.T) {
-	tpl, _ := template.ParseFiles("../template/post.html")
+	tpl, _ := template.ParseFiles("../themes/微/post.html")
 	type args struct {
 		sourcePath  string
 		destination string
