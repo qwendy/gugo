@@ -10,6 +10,7 @@
     
     <title>蚊香的博客</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/prettify.css">
     <style type="text/css">
         @font-face {
             font-family: 'myHan';
@@ -19,6 +20,12 @@
         .han {
             font-weight: normal;
             font-family: "myHan";
+        }
+        
+        pre {
+            background: #fafafa;
+            font-family: Menlo, Bitstream Vera Sans Mono, DejaVu Sans Mono, Monaco, Consolas, monospace;
+            border: 1!important;
         }
         
         .postContent h1 {
@@ -129,6 +136,7 @@
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/semantic.js"></script>
+    <script src="/static/js/prettify.js"></script>
     <script>
         $(document)
             .ready(function() {
@@ -218,7 +226,7 @@
                 
                 <h3 class="ui header"><a href="/2016/12/22/%ef%bc%88%e7%bf%bb%e8%af%91%ef%bc%89Sharding-mongo%e5%ae%98%e6%96%b9%e6%96%87%e6%a1%a33.2%e7%89%88%e6%9c%ac">（翻译）Sharding-mongo官方文档3.2版本</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>此篇文章为mongo官方文档，版本为3.2. 地址为：<a href="https://docs.mongodb.com/v3.2/core/sharded-cluster-components/">https://docs.mongodb.com/v3.2/core/sharded-cluster-components/</a></p>
 
@@ -239,7 +247,7 @@ MongoDb支持通过分片来进行水平扩展。</p>
 - config servers: 配置服务器存储元数据（metadata）并配置集群的设置。在MongoDB 3.4，配置服务器必须部署成副本集</p>
 
 <p>下面这张图描述了在一个分片集群中的交互
-<img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.png" alt="Alt text" /></p>
+<img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.png" alt="Alt text"/></p>
 
 <p>MongoDB分片数据是collection级别的，在集群中分发collection数据</p>
 
@@ -251,7 +259,7 @@ MongoDb支持通过分片来进行水平扩展。</p>
                 
                 <h3 class="ui header"><a href="/2016/12/22/MongoDB-Sharding%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4">MongoDB-Sharding常用命令</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>资料来源： <a href="https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/">https://docs.mongodb.com/v3.2/tutorial/administer-shard-tags/</a>
 详细命令参考： <a href="https://docs.mongodb.com/v3.2/reference/sharding/">https://docs.mongodb.com/v3.2/reference/sharding/</a></p>
@@ -268,23 +276,23 @@ MongoDb支持通过分片来进行水平扩展。</p>
 
 <li><p>设置分片服务器</p>
 
-<pre><code>db.runCommand({ addshard:&quot;127.0.0.1:27100&quot; })
-db.runCommand({ addshard:&quot;127.0.0.1:27101&quot; })
-db.runCommand({ addshard:&quot;127.0.0.1:27017&quot; })
+<pre><code>db.runCommand({ addshard:&#34;127.0.0.1:27100&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27101&#34; })
+db.runCommand({ addshard:&#34;127.0.0.1:27017&#34; })
 或者
-sh.addShard(&quot;127.0.0.1:27100&quot;)
+sh.addShard(&#34;127.0.0.1:27100&#34;)
 </code></pre></li>
 
 <li><p>设置要分片的数据库</p>
 
-<pre><code>db.runCommand({ enablesharding:&quot;qdgame&quot; })
+<pre><code>db.runCommand({ enablesharding:&#34;qdgame&#34; })
 或者：
-sh.enableSharding(&quot;qdgame&quot;)
+sh.enableSharding(&#34;qdgame&#34;)
 </code></pre></li>
 
 <li><p>关闭balancing</p>
 
-<pre><code>sh.disableBalancing(&quot;qdgame.backpack&quot;)
+<pre><code>sh.disableBalancing(&#34;qdgame.backpack&#34;)
 </code></pre></li>
 </ul>
 
@@ -296,7 +304,7 @@ sh.enableSharding(&quot;qdgame&quot;)
                 
                 <h3 class="ui header"><a href="/2016/12/20/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%882%ef%bc%89">《Go语言圣经》学习小记（2）</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <h2>函数</h2>
 
@@ -306,8 +314,8 @@ sh.enableSharding(&quot;qdgame&quot;)
 实参通过值的方式传递，因此函数的形参是实参的拷贝。对形参进行修改不会影响实参。但是，如果实参包括引用类型，如指针，slice(切片)、map、<strong>function</strong>、channel等类型，实参可能会由于函数的简介引用被修改。
 <strong>没有函数体的函数声明，这表示该函数不是以Go实现的。</strong>这样的声明定义了函数标识符。</p>
 
-<pre><code class="language-golang">package math
-func Sin(x float64) float //implemented in assembly language
+<pre><code class="language-golang"><span class="kwd">package</span> <span class="pln">math</span>
+<span class="kwd">func</span> <span class="typ">Sin</span><span class="pun">(</span><span class="pln">x</span> <span class="kwd">float64</span><span class="pun">)</span> <span class="kwd">float</span> <span class="com">//implemented in assembly language</span>
 </code></pre>
 
 <p>注：此代码来自官方的math包中</p>
@@ -320,7 +328,7 @@ func Sin(x float64) float //implemented in assembly language
                 
                 <h3 class="ui header"><a href="/2016/12/09/mongo%e6%95%b0%e6%8d%ae%e5%ba%93sharding%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95">mongo数据库sharding学习记录</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>参考文章：<a href="http://www.runoob.com/mongodb/mongodb-sharding.html">http://www.runoob.com/mongodb/mongodb-sharding.html</a></p>
 
@@ -343,7 +351,7 @@ func Sin(x float64) float //implemented in assembly language
                 
                 <h3 class="ui header"><a href="/2016/12/07/%e3%80%8aGo%e8%af%ad%e8%a8%80%e5%9c%a3%e7%bb%8f%e3%80%8b%e5%ad%a6%e4%b9%a0%e5%b0%8f%e8%ae%b0%ef%bc%881%ef%bc%89">《Go语言圣经》学习小记（1）</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>记录《Go语言圣经》学习笔记。（实为划重点）</p>
 

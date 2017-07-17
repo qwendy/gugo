@@ -10,6 +10,7 @@
     
     <title>蚊香的博客</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/prettify.css">
     <style type="text/css">
         @font-face {
             font-family: 'myHan';
@@ -19,6 +20,12 @@
         .han {
             font-weight: normal;
             font-family: "myHan";
+        }
+        
+        pre {
+            background: #fafafa;
+            font-family: Menlo, Bitstream Vera Sans Mono, DejaVu Sans Mono, Monaco, Consolas, monospace;
+            border: 1!important;
         }
         
         .postContent h1 {
@@ -129,6 +136,7 @@
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/semantic.js"></script>
+    <script src="/static/js/prettify.js"></script>
     <script>
         $(document)
             .ready(function() {
@@ -218,7 +226,7 @@
                 
                 <h3 class="ui header"><a href="/2017/07/04/%28%e7%bf%bb%e8%af%91%29writing%20a%20Static%20Blog%20Generator%20in%20Go">(翻译)writing a Static Blog Generator in Go</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>翻译原文：<a href="https://zupzup.org/static-blog-generator-go/?utm_source=golangweekly&amp;utm_medium=emai">https://zupzup.org/static-blog-generator-go/?utm_source=golangweekly&amp;utm_medium=emai</a></p>
 
@@ -244,7 +252,7 @@
                 
                 <h3 class="ui header"><a href="/2017/06/28/%28%e7%bf%bb%e8%af%91%29%e5%8f%96%e6%b6%88%e5%a4%9a%e4%b8%aaGoroutines">(翻译)取消多个Goroutines</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>原文 <a href="https://chilts.org/2017/06/12/cancelling-multiple-goroutines">https://chilts.org/2017/06/12/cancelling-multiple-goroutines</a></p>
 
@@ -279,7 +287,7 @@
                 
                 <h3 class="ui header"><a href="/2017/06/28/lec01%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0">lec01学习笔记</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>分为: 存储，通讯和计算
 关键点：实现，性能，容错和一致性。一致性和性能不可兼得
@@ -289,7 +297,7 @@ split-brain的意思是A true split brain means multiple systems are online and 
 
 <p>扩展：不互相等待，不共享数据。可并发执行。可单纯的配置更多的计算机来获得更多的吞吐量
 性能：Hard to build a network than can run 1000x faster than a single computer.So they cared about minimizing movement of data over the network.一般会被网络限制。尽量减少数据在网络上传输。
-容错：当Map和Reduce失败时，重新运行。他们仅仅是函数而已&ndash;他们不修改输入的内容，不用保存状态，不共享内存，没有Map-Map和Reduce-Reduce的交互。所以重新执行会得到相同的输出。纯函数（pure function）的这个需求是相对于其他并行编程方案的主要限制，也是MR简单的原因。</p>
+容错：当Map和Reduce失败时，重新运行。他们仅仅是函数而已–他们不修改输入的内容，不用保存状态，不共享内存，没有Map-Map和Reduce-Reduce的交互。所以重新执行会得到相同的输出。纯函数（pure function）的这个需求是相对于其他并行编程方案的主要限制，也是MR简单的原因。</p>
 
 <p>MapReduce由Mater和Worker组成。Master给workers分配工作，决定worker运行map方法还是reduce方法。当worker执行错误，直接重启worker就好。
 master的调度程序</p>
@@ -302,7 +310,7 @@ master的调度程序</p>
                 
                 <h3 class="ui header"><a href="/2017/06/21/%e4%bd%bf%e7%94%a8%e7%bd%91%e9%a1%b5%e6%89%93%e5%bc%80%e6%9c%ac%e5%9c%b0%e7%a8%8b%e5%ba%8f">使用网页打开本地程序</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>浏览器中使用window.open()打开URL。当URL为特定的前缀的时候（URI Scheme），就会调用注册表中对应的指令。</p>
 
@@ -313,50 +321,50 @@ master的调度程序</p>
 
 <pre><code>HKEY_CLASSES_ROOT
    alert
-      (Default) = &quot;URL:Alert Protocol&quot;
-      URL Protocol = &quot;&quot;
+      (Default) = &#34;URL:Alert Protocol&#34;
+      URL Protocol = &#34;&#34;
       DefaultIcon
-         (Default) = &quot;alert.exe,1&quot;
+         (Default) = &#34;alert.exe,1&#34;
       shell
          open
             command
-               (Default) = &quot;C:\Program Files\Alert\alert.exe&quot; &quot;%1
+               (Default) = &#34;C:\Program Files\Alert\alert.exe&#34; &#34;%1
 </code></pre>
 
 <p>使用go操作注册表.path为程序的地址。uri为调用程序的URI Scheme。
-使用js调用window.open(&ldquo;uri://&ldquo;)就可以打开程序。</p>
+使用js调用window.open(“uri://“)就可以打开程序。</p>
 
-<pre><code class="language-go">func regKey(path string,uri string) error {
-	vconsoleKey, ok, err := registry.CreateKey(registry.CLASSES_ROOT, uri, registry.CREATE_SUB_KEY|registry.SET_VALUE)
-	if err != nil {
-		logger.Printf(&quot;CreateKey console err :%v\n&quot;, err)
-		return err
-	}
-	if ok {
-		return err
-	}
-	defer vconsoleKey.Close()
-	vconsoleKey.SetStringValue(&quot;URL Protocol&quot;, &quot;&quot;)
-	vconsoleKey.SetStringValue(&quot;DefaultIcon&quot;, path)
-	shellKey, _, err := registry.CreateKey(vconsoleKey, `shell`, registry.CREATE_SUB_KEY)
-	if err != nil {
-		logger.Printf(&quot;CreateKey shell err :%v\n&quot;, err)
-		return err
-	}
-	openKey, _, err := registry.CreateKey(shellKey, `open`, registry.CREATE_SUB_KEY)
-	if err != nil {
-		logger.Printf(&quot;CreateKey open err :%v\n&quot;, err)
-		return err
-	}
-	commandKey, _, err := registry.CreateKey(openKey, `command`, registry.CREATE_SUB_KEY|registry.SET_VALUE)
-	if err != nil {
-		logger.Printf(&quot;CreateKey err :%v\n&quot;, err)
-		return err
-	}
-	commandKey.SetStringValue(&quot;&quot;, path)
+<pre><code class="language-go"><span class="kwd">func</span> <span class="pln">regKey</span><span class="pun">(</span><span class="pln">path</span> <span class="pln">string</span><span class="pun">,</span><span class="pln">uri</span> <span class="pln">string</span><span class="pun">)</span> <span class="pln">error</span> <span class="pun">{</span>
+	<span class="pln">vconsoleKey</span><span class="pun">,</span> <span class="pln">ok</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CreateKey</span><span class="pun">(</span><span class="pln">registry</span><span class="pun">.</span><span class="typ">CLASSES_ROOT</span><span class="pun">,</span> <span class="pln">uri</span><span class="pun">,</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CREATE_SUB_KEY</span><span class="pun">|</span><span class="pln">registry</span><span class="pun">.</span><span class="typ">SET_VALUE</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">logger</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;CreateKey console err :%v\n&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="kwd">return</span> <span class="pln">err</span>
+	<span class="pun">}</span>
+	<span class="kwd">if</span> <span class="pln">ok</span> <span class="pun">{</span>
+		<span class="kwd">return</span> <span class="pln">err</span>
+	<span class="pun">}</span>
+	<span class="pln">defer</span> <span class="pln">vconsoleKey</span><span class="pun">.</span><span class="typ">Close</span><span class="pun">(</span><span class="pun">)</span>
+	<span class="pln">vconsoleKey</span><span class="pun">.</span><span class="typ">SetStringValue</span><span class="pun">(</span><span class="str">&#34;URL Protocol&#34;</span><span class="pun">,</span> <span class="str">&#34;&#34;</span><span class="pun">)</span>
+	<span class="pln">vconsoleKey</span><span class="pun">.</span><span class="typ">SetStringValue</span><span class="pun">(</span><span class="str">&#34;DefaultIcon&#34;</span><span class="pun">,</span> <span class="pln">path</span><span class="pun">)</span>
+	<span class="pln">shellKey</span><span class="pun">,</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CreateKey</span><span class="pun">(</span><span class="pln">vconsoleKey</span><span class="pun">,</span> <span class="str">`shell`</span><span class="pun">,</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CREATE_SUB_KEY</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">logger</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;CreateKey shell err :%v\n&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="kwd">return</span> <span class="pln">err</span>
+	<span class="pun">}</span>
+	<span class="pln">openKey</span><span class="pun">,</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CreateKey</span><span class="pun">(</span><span class="pln">shellKey</span><span class="pun">,</span> <span class="str">`open`</span><span class="pun">,</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CREATE_SUB_KEY</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">logger</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;CreateKey open err :%v\n&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="kwd">return</span> <span class="pln">err</span>
+	<span class="pun">}</span>
+	<span class="pln">commandKey</span><span class="pun">,</span> <span class="pln">_</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CreateKey</span><span class="pun">(</span><span class="pln">openKey</span><span class="pun">,</span> <span class="str">`command`</span><span class="pun">,</span> <span class="pln">registry</span><span class="pun">.</span><span class="typ">CREATE_SUB_KEY</span><span class="pun">|</span><span class="pln">registry</span><span class="pun">.</span><span class="typ">SET_VALUE</span><span class="pun">)</span>
+	<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+		<span class="pln">logger</span><span class="pun">.</span><span class="typ">Printf</span><span class="pun">(</span><span class="str">&#34;CreateKey err :%v\n&#34;</span><span class="pun">,</span> <span class="pln">err</span><span class="pun">)</span>
+		<span class="kwd">return</span> <span class="pln">err</span>
+	<span class="pun">}</span>
+	<span class="pln">commandKey</span><span class="pun">.</span><span class="typ">SetStringValue</span><span class="pun">(</span><span class="str">&#34;&#34;</span><span class="pun">,</span> <span class="pln">path</span><span class="pun">)</span>
 
-	return nil
-}
+	<span class="kwd">return</span> <span class="kwd">nil</span>
+<span class="pun">}</span>
 </code></pre>
 
 <h2>获取管理员权限</h2>
@@ -369,16 +377,16 @@ master的调度程序</p>
 
 <p>nac.mainfest的内容为：</p>
 
-<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
-&lt;assembly xmlns=&quot;urn:schemas-microsoft-com:asm.v1&quot; manifestVersion=&quot;1.0&quot;&gt;
-&lt;trustInfo xmlns=&quot;urn:schemas-microsoft-com:asm.v3&quot;&gt;
-&lt;security&gt;
-&lt;requestedPrivileges&gt;
-&lt;requestedExecutionLevel level=&quot;requireAdministrator&quot;/&gt;
-&lt;/requestedPrivileges&gt;
-&lt;/security&gt;
-&lt;/trustInfo&gt;
-&lt;/assembly&gt;
+<pre><code class="language-xml"><span class="pun">&lt;</span><span class="pun">?</span><span class="pln">xml</span> <span class="pln">version</span><span class="pun">=</span><span class="str">&#34;1.0&#34;</span> <span class="pln">encoding</span><span class="pun">=</span><span class="str">&#34;UTF-8&#34;</span> <span class="pln">standalone</span><span class="pun">=</span><span class="str">&#34;yes&#34;</span><span class="pun">?</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pln">assembly</span> <span class="pln">xmlns</span><span class="pun">=</span><span class="str">&#34;urn:schemas-microsoft-com:asm.v1&#34;</span> <span class="pln">manifestVersion</span><span class="pun">=</span><span class="str">&#34;1.0&#34;</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pln">trustInfo</span> <span class="pln">xmlns</span><span class="pun">=</span><span class="str">&#34;urn:schemas-microsoft-com:asm.v3&#34;</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pln">security</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pln">requestedPrivileges</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pln">requestedExecutionLevel</span> <span class="pln">level</span><span class="pun">=</span><span class="str">&#34;requireAdministrator&#34;</span><span class="pun">/</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pun">/</span><span class="pln">requestedPrivileges</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pun">/</span><span class="pln">security</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pun">/</span><span class="pln">trustInfo</span><span class="pun">&gt;</span>
+<span class="pun">&lt;</span><span class="pun">/</span><span class="pln">assembly</span><span class="pun">&gt;</span>
 </code></pre>
 
                 </div>
@@ -389,7 +397,7 @@ master的调度程序</p>
                 
                 <h3 class="ui header"><a href="/2016/12/26/%ef%bc%88%e7%bf%bb%e8%af%91%ef%bc%89BitTorrent-Protocol%e5%8d%8f%e8%ae%ae%e8%a7%84%e8%8c%83">（翻译）BitTorrent-Protocol协议规范</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>本文翻译原文：<a href="http://www.bittorrent.org/beps/bep_0003.html">http://www.bittorrent.org/beps/bep_0003.html</a>
 BitTorrent是一个分发文件的协议。它通过URL识别内容，旨在与网络无缝集成。它和一般的HTTP相比的优势在于，当同一个文件的多个下载同时发生时，下载者相互上传，使得文件源可以支持非常大量下载，而其负载增加很小。</p>

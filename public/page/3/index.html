@@ -10,6 +10,7 @@
     
     <title>蚊香的博客</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/prettify.css">
     <style type="text/css">
         @font-face {
             font-family: 'myHan';
@@ -19,6 +20,12 @@
         .han {
             font-weight: normal;
             font-family: "myHan";
+        }
+        
+        pre {
+            background: #fafafa;
+            font-family: Menlo, Bitstream Vera Sans Mono, DejaVu Sans Mono, Monaco, Consolas, monospace;
+            border: 1!important;
         }
         
         .postContent h1 {
@@ -129,6 +136,7 @@
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/semantic.js"></script>
+    <script src="/static/js/prettify.js"></script>
     <script>
         $(document)
             .ready(function() {
@@ -218,7 +226,7 @@
                 
                 <h3 class="ui header"><a href="/2016/12/05/Error%20handling%20and%20Go%20%28%e7%bf%bb%e8%af%91%29">Error handling and Go (翻译)</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>本篇文章来自《The Go Blog》。文章地址为<a href="https://blog.golang.org/error-handling-and-go">https://blog.golang.org/error-handling-and-go</a>
 下面是在下的翻译。因为看英文看完就忘，所以翻译翻译，聊以自慰。</p>
@@ -231,16 +239,16 @@
 
 <p>如果你写过Go的代码，你可能已经遇到了内置的error类型。Go的代码使用error表示异常状态。例如os.Open函数打开文件失败的时候，返回一个不为nil的error值。</p>
 
-<pre><code class="language-golang">func Open(name string) (file *File, err error)
+<pre><code class="language-golang"><span class="kwd">func</span> <span class="typ">Open</span><span class="pun">(</span><span class="pln">name</span> <span class="pln">string</span><span class="pun">)</span> <span class="pun">(</span><span class="pln">file</span> <span class="pun">*</span><span class="typ">File</span><span class="pun">,</span> <span class="pln">err</span> <span class="pln">error</span><span class="pun">)</span>
 </code></pre>
 
 <p>下面的代码使用os.Open打开一个文件。如果出现一个error,它会调用log.Fatal来打印出错误结束。</p>
 
-<pre><code class="language-golang">f, err := os.Open(&quot;filename.ext&quot;)
-if err != nil {
-    log.Fatal(err)
-}
-// do something with the open *File f
+<pre><code class="language-golang"><span class="pln">f</span><span class="pun">,</span> <span class="pln">err</span> <span class="pun">:</span><span class="pun">=</span> <span class="pln">os</span><span class="pun">.</span><span class="typ">Open</span><span class="pun">(</span><span class="str">&#34;filename.ext&#34;</span><span class="pun">)</span>
+<span class="kwd">if</span> <span class="pln">err</span> <span class="pun">!</span><span class="pun">=</span> <span class="kwd">nil</span> <span class="pun">{</span>
+    <span class="pln">log</span><span class="pun">.</span><span class="typ">Fatal</span><span class="pun">(</span><span class="pln">err</span><span class="pun">)</span>
+<span class="pun">}</span>
+<span class="com">// do something with the open *File f</span>
 </code></pre>
 
 <p>在Go中，你仅需要知道这些关于error类型的知识，就能做很多事情了，但是在这篇文章中我们将仔细研究error，并讨论在Go中的一些好的错误处理的实例</p>
@@ -253,12 +261,12 @@ if err != nil {
                 
                 <h3 class="ui header"><a href="/2016/09/03/%e6%88%91%e7%9a%84Redis%e5%88%9d%e6%ac%a1%e5%ae%9e%e6%88%98">我的Redis初次实战</a></h3>
                 <div class="postContent">
-                    <hr />
+                    <hr/>
 
 <p>因为各种原因，我必须在windows上进行服务器开发，所以我需要在windows上运行redis，即使《redis in action》上明确写着不推荐在windows上使用redis。
 我在windows上使用的redis是从 <a href="https://github.com/dmajkic/redis/downloads">https://github.com/dmajkic/redis/downloads</a> 获取的。
 我使用redis的桌面客户端为Redis Desktop Manager。使用的原因仅仅是第一个搜到的客户端就是他且没有让我讨厌的地方，就继续用了。软件地址<a href="https://redisdesktop.com/download。">https://redisdesktop.com/download。</a>
-极力推荐《redis实战》。从第一章开始，在介绍什么是redis，有什么用，与其他数据库有什么区别之后，就开始从一个项目开始，演示如何使用redis。讲的第一个项目是对文章进行投票，这让我的回忆起我的大学的第一个项目&ndash;一个投票系统的实现。</p>
+极力推荐《redis实战》。从第一章开始，在介绍什么是redis，有什么用，与其他数据库有什么区别之后，就开始从一个项目开始，演示如何使用redis。讲的第一个项目是对文章进行投票，这让我的回忆起我的大学的第一个项目–一个投票系统的实现。</p>
 
                 </div>
                 <a class="ui large button" href="/2016/09/03/%e6%88%91%e7%9a%84Redis%e5%88%9d%e6%ac%a1%e5%ae%9e%e6%88%98">Read More</a>

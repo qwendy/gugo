@@ -142,12 +142,12 @@ func (p *Post) ParseMetaData() (err error) {
 // convert mardown file data to html
 func (p *Post) Convert() (err error) {
 	p.htmlData = blackfriday.MarkdownCommon(p.sourceData)
-	err = p.fixHtmlData(p.htmlData)
+	p.htmlData, err = p.fixHtmlData(p.htmlData)
 	if err != nil {
 		return err
 	}
 	p.overViewHtml = blackfriday.MarkdownCommon(p.overviewData)
-	err = p.fixHtmlData(p.overViewHtml)
+	p.overViewHtml, err = p.fixHtmlData(p.overViewHtml)
 	if err != nil {
 		return err
 	}
@@ -197,25 +197,25 @@ func (p *Post) Generate() (err error) {
 
 // replace code in html file,use syntaxhighlight code
 // remove some html tags such as <head>
-func (p *Post) fixHtmlData(data []byte) (err error) {
+func (p *Post) fixHtmlData(data []byte) (newData []byte, err error) {
 	reader := bytes.NewReader(data)
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
-		return fmt.Errorf("Creating NewDocumentFromReader Err:%v", err)
+		return newData, fmt.Errorf("Creating NewDocumentFromReader Err:%v", err)
 	}
 	doc.Find("code[class*=\"language-\"]").Each(func(i int, s *goquery.Selection) {
 		oldCode := s.Text()
 		formatted, _ := syntaxhighlight.AsHTML([]byte(oldCode))
-		s.ReplaceWithHtml(string(formatted))
+		s.Empty()
+		s.AppendHtml(string(formatted))
 	})
 	newDoc, err := doc.Html()
 	if err != nil {
-		return fmt.Errorf("Generating new html err: %v", err)
+		return newData, fmt.Errorf("Generating new html err: %v", err)
 	}
 	// replace the html tags that we donnot need
 	for _, tag := range []string{"<html>", "</html>", "<head>", "</head>", "<body>", "</body>"} {
 		newDoc = strings.Replace(newDoc, tag, "", 1)
 	}
-	data = []byte(newDoc)
-	return
+	return []byte(newDoc), err
 }

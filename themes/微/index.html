@@ -10,6 +10,7 @@
     <!-- Site Properties -->
     <title>蚊香的博客</title>
     <link rel="stylesheet" type="text/css" href="/static/css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/prettify.css">
     <style type="text/css">
         @font-face {
             font-family: 'myHan';
@@ -19,6 +20,12 @@
         .han {
             font-weight: normal;
             font-family: "myHan";
+        }
+        
+        pre {
+            background: #fafafa;
+            font-family: Menlo, Bitstream Vera Sans Mono, DejaVu Sans Mono, Monaco, Consolas, monospace;
+            border: 1!important;
         }
         
         .postContent h1 {
@@ -129,6 +136,7 @@
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/semantic.js"></script>
+    <script src="/static/js/prettify.js"></script>
     <script>
         $(document)
             .ready(function() {
