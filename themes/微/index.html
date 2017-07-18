@@ -185,7 +185,7 @@
                         <i class="sidebar icon"></i>
                     </a>
                     <div class="left item">
-                        <a class="ui inverted button" href="/">清 | 狂</a>
+                        <a class="ui inverted teal button" href="/">清 | 狂</a>
                     </div>
                     <div class="right item">
                         <a class="active item" href="/">Home</a>
@@ -211,11 +211,23 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 {{ range $key,$post := .Posts}}
-                <h1 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h1>
-                <div class="postContent">
-                    {{$post.TemplateData.Overview}}
+                <div class="ui segment">
+                    {{range $_,$c := $post.TemplateData.Meta.Category}}
+                    <a class="ui teal right ribbon label">  
+                        {{$c}} 
+                    </a> {{end}}
+
+                    <h1 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h1>
+
+                    <p>
+                        {{range $_,$c := $post.TemplateData.Meta.Tags}}
+                        <a class="ui blue tag label">{{$c}}</a> {{end}}
+                    </p>
+                    <div class="postContent">
+                        {{$post.TemplateData.Overview}}
+                    </div>
+                    <a class="ui large button" href="/{{$post.Location}}">Read More</a>
                 </div>
-                <a class="ui large button" href="/{{$post.Location}}">Read More</a>
                 <h4 class="ui horizontal header divider">
                     <a href="#">这是分界线哦~~</a>
                 </h4>
