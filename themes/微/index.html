@@ -71,21 +71,8 @@
             padding: 8em 0em;
         }
         
-        .ui.vertical.stripe h3 {
-            font-size: 2em;
-        }
-        
-        .ui.vertical.stripe .button+h3,
-        .ui.vertical.stripe p+h3 {
-            margin-top: 3em;
-        }
-        
         .ui.vertical.stripe .floated.image {
             clear: both;
-        }
-        
-        .ui.vertical.stripe p {
-            font-size: 1.33em;
         }
         
         .ui.vertical.stripe .horizontal.divider {
@@ -224,7 +211,7 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 {{ range $key,$post := .Posts}}
-                <h3 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h3>
+                <h1 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h1>
                 <div class="postContent">
                     {{$post.TemplateData.Overview}}
                 </div>
