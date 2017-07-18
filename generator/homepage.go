@@ -132,7 +132,6 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 	}
 	p := hp.Posts[min:max]
 	log.Infof("page:%v,post:%v-%v", page, min, max)
-	fmt.Println(p[len(p)-1].TemplateData.Meta.Date)
 	for _, xxx := range p {
 		log.Infoln(xxx.Meta)
 	}

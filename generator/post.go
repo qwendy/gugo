@@ -27,7 +27,6 @@ type Post struct {
 	overViewHtml []byte
 	Meta         *Meta
 	Template     *template.Template
-	TemplateData *PostTemplateData
 }
 
 type PostTemplateData struct {
@@ -175,18 +174,19 @@ func (p *Post) CreateDestinationPath() (err error) {
 
 // write html data to file
 func (p *Post) Generate() (err error) {
-	f, err := os.Create(p.Destination + "/" + p.Location + "/index.html")
+	dir := p.Destination + "/" + p.Location + "/index.html"
+	f, err := os.Create(dir)
 	if err != nil {
 		return fmt.Errorf("Creating file %s Err: %v", p.Destination, err)
 	}
 	defer f.Close()
 	writer := bufio.NewWriter(f)
-	p.TemplateData = &PostTemplateData{
+	data := &PostTemplateData{
 		Meta:     p.Meta,
 		Content:  template.HTML(string(p.htmlData)),
 		Overview: template.HTML(string(p.overViewHtml)),
 	}
-	if err := p.Template.Execute(writer, p.TemplateData); err != nil {
+	if err := p.Template.Execute(writer, data); err != nil {
 		return fmt.Errorf("Executing template Error: %v", err)
 	}
 	if err := writer.Flush(); err != nil {
