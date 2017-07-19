@@ -2,6 +2,7 @@ package generator
 
 import (
 	"html/template"
+	"sort"
 )
 
 type Tags struct {
@@ -46,10 +47,17 @@ func (t *Tags) Generate() error {
 		return err
 	}
 	for name, info := range t.Infos {
+		sort.Slice(info, func(i, j int) bool {
+			if info[i].Meta.Date > info[j].Meta.Date {
+				return true
+			}
+			return false
+		})
 		d := dir + "/" + name
 		if err := GenerateIndexFile(t.ListTemplate, struct {
-			Info []Post
-		}{Info: info}, d); err != nil {
+			Name  string
+			Infos []Post
+		}{Name: name, Infos: info}, d); err != nil {
 			return err
 		}
 	}

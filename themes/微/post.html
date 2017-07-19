@@ -199,9 +199,12 @@
             <div class="ui text container">
                 <h3 class="ui header">分类：{{.Meta.Category}}</h3>
                 {{.Content}}
+                <p>
+                    标签: {{range $_, $tag := .Meta.Tags}}
+                    <a class="ui blue tag label" href="/tags/{{$tag}}">{{$tag}} </a> {{end}}
+                </p>
             </div>
         </div>
-
 
         <div class="ui inverted vertical footer segment">
             <div class="ui container">
