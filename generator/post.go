@@ -24,7 +24,8 @@ type Post struct {
 	Destination  string // the folder to create directory and html file
 	Location     string // the location(directory) of the html file
 	htmlData     []byte
-	overViewHtml []byte
+	overviewHtml []byte
+	TplData      *PostTemplateData
 	Meta         *Meta
 	Template     *template.Template
 }
@@ -145,8 +146,8 @@ func (p *Post) Convert() (err error) {
 	if err != nil {
 		return err
 	}
-	p.overViewHtml = blackfriday.MarkdownCommon(p.overviewData)
-	p.overViewHtml, err = p.fixHtmlData(p.overViewHtml)
+	p.overviewHtml = blackfriday.MarkdownCommon(p.overviewData)
+	p.overviewHtml, err = p.fixHtmlData(p.overviewHtml)
 	if err != nil {
 		return err
 	}
@@ -174,25 +175,13 @@ func (p *Post) CreateDestinationPath() (err error) {
 
 // write html data to file
 func (p *Post) Generate() (err error) {
-	dir := p.Destination + "/" + p.Location + "/index.html"
-	f, err := os.Create(dir)
-	if err != nil {
-		return fmt.Errorf("Creating file %s Err: %v", p.Destination, err)
-	}
-	defer f.Close()
-	writer := bufio.NewWriter(f)
-	data := &PostTemplateData{
+	dir := p.Destination + "/" + p.Location
+	p.TplData = &PostTemplateData{
 		Meta:     p.Meta,
 		Content:  template.HTML(string(p.htmlData)),
-		Overview: template.HTML(string(p.overViewHtml)),
+		Overview: template.HTML(string(p.overviewHtml)),
 	}
-	if err := p.Template.Execute(writer, data); err != nil {
-		return fmt.Errorf("Executing template Error: %v", err)
-	}
-	if err := writer.Flush(); err != nil {
-		return fmt.Errorf("Writing file Err: %v", err)
-	}
-	return nil
+	return GenerateIndexFile(p.Template, p.TplData, dir)
 }
 
 // replace code in html file,use syntaxhighlight code

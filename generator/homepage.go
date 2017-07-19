@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"bufio"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -157,20 +156,6 @@ func (hp *HomePage) getPageData(page, allPageNum int) (tplData HomePageTemplateD
 }
 
 func (hp *HomePage) writeToHtml(tplData HomePageTemplateData) error {
-	if err := os.MkdirAll(hp.Destination+"/"+tplData.CurPageUrl, 0777); err != nil {
-		return fmt.Errorf("Create directory error:%v", err)
-	}
-	f, err := os.Create(hp.Destination + "/" + tplData.CurPageUrl + "/index.html")
-	if err != nil {
-		return fmt.Errorf("Creating file %s Err: %v", tplData.CurPageUrl, err)
-	}
-	defer f.Close()
-	writer := bufio.NewWriter(f)
-	if err := hp.IndexTemplate.Execute(writer, tplData); err != nil {
-		return fmt.Errorf("Executing template Error: %v", err)
-	}
-	if err := writer.Flush(); err != nil {
-		return fmt.Errorf("Writing file Err: %v", err)
-	}
-	return nil
+	dir := hp.Destination + "/" + tplData.CurPageUrl
+	return GenerateIndexFile(hp.IndexTemplate, tplData, dir)
 }

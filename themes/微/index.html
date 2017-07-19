@@ -156,7 +156,7 @@
         <div class="ui container nav">
             <a class="active item" href="/">首页</a></a>
             <a class="item">Category</a>
-            <a class="item">标签</a>
+            <a class="item" href="/tags">标签</a>
             <a class="item">About</a>
             <div class="right item">
                 <div class="ui animated fade button" tabindex="0">
@@ -171,7 +171,7 @@
     <div class="ui vertical inverted sidebar menu">
         <a class="active item" href="/">首页</a>
         <a class="item">归档</a>
-        <a class="item">标签</a>
+        <a class="item" href="/tags">标签</a>
         <a class="item">关于</a>
     </div>
 
@@ -191,7 +191,7 @@
                     <div class="right item">
                         <a class="active item" href="/">Home</a>
                         <a class="item">分类</a>
-                        <a class="item">Tags</a>
+                        <a class="item" href="/tags">Tags</a>
                         <a class="item">关于我</a>
 
                     </div>
@@ -213,19 +213,19 @@
             <div class="ui text container">
                 {{ range $key,$post := .Posts}}
                 <div class="ui segment">
-                    {{range $_,$c := $post.TemplateData.Meta.Category}}
+                    {{range $_,$c := $post.Meta.Category}}
                     <a class="ui teal right ribbon label">  
                         {{$c}} 
                     </a> {{end}}
 
-                    <h1 class="ui header"><a href="/{{$post.Location}}">{{$post.TemplateData.Meta.Title}}</a></h1>
+                    <h1 class="ui header"><a href="/{{$post.Location}}">{{$post.Meta.Title}}</a></h1>
 
                     <p>
-                        {{range $_,$c := $post.TemplateData.Meta.Tags}}
+                        {{range $_,$c := $post.Meta.Tags}}
                         <a class="ui blue tag label">{{$c}}</a> {{end}}
                     </p>
                     <div class="postContent">
-                        {{$post.TemplateData.Overview}}
+                        {{ $post.TplData.Overview }}
                     </div>
                     <a class="ui large button" href="/{{$post.Location}}">Read More</a>
                 </div>

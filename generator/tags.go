@@ -1,29 +1,28 @@
 package generator
 
 import (
-	"bufio"
-	"fmt"
 	"html/template"
-	"os"
 )
 
 type Tags struct {
-	Posts       []Post
-	Infos       map[string][]Post
-	Template    *template.Template
-	Destination string
+	Posts        []Post
+	Infos        map[string][]Post
+	Template     *template.Template
+	ListTemplate *template.Template
+	Destination  string
 }
 
 type TagsTemplateData struct {
 	Infos map[string][]Post
 }
 
-func NewTags(p []Post, t *template.Template, des string) *Tags {
+func NewTags(p []Post, t, listTpl *template.Template, des string) *Tags {
 	return &Tags{
-		Infos:       make(map[string][]Post),
-		Posts:       p,
-		Template:    t,
-		Destination: des,
+		Infos:        make(map[string][]Post),
+		Posts:        p,
+		Template:     t,
+		ListTemplate: listTpl,
+		Destination:  des,
 	}
 }
 
@@ -35,25 +34,24 @@ func (t *Tags) SetInfos() {
 	}
 }
 
+// Generate the index.html file of tag directory
+// and index.html files of kinds of tags directories
 func (t *Tags) Generate() error {
-	dir := t.Destination + "/tags"
-	if err := os.MkdirAll(dir, 0777); err != nil {
-		return fmt.Errorf("Create directory error:%v", err)
-	}
-	f, err := os.Create(dir + "/index.html")
-	if err != nil {
-		return fmt.Errorf("Creating file %s Err:%v", dir, err)
-	}
-	defer f.Close()
-	writer := bufio.NewWriter(f)
 	data := TagsTemplateData{
 		Infos: t.Infos,
 	}
-	if err := t.Template.Execute(writer, data); err != nil {
-		return fmt.Errorf("Executing template Error: %v", err)
+	dir := t.Destination + "/tags"
+	err := GenerateIndexFile(t.Template, data, dir)
+	if err != nil {
+		return err
 	}
-	if err := writer.Flush(); err != nil {
-		return fmt.Errorf("Writing file Err: %v", err)
+	for name, info := range t.Infos {
+		d := dir + "/" + name
+		if err := GenerateIndexFile(t.ListTemplate, struct {
+			Info []Post
+		}{Info: info}, d); err != nil {
+			return err
+		}
 	}
 	return nil
 }
