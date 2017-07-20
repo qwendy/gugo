@@ -198,7 +198,8 @@
 
         <div class="ui stripe vertical segment">
             <div class="ui text container">
-                <h3 class="ui header">分类：{{.Meta.Category}}</h3>
+                <h3 class="ui header">分类：{{range $_, $name := .Meta.Category}}
+                    <a class="ui teal tag label" href="/category/{{$name}}">{{$name}} </a> {{end}}</h3>
                 {{.Content}}
                 <p>
                     标签: {{range $_, $tag := .Meta.Tags}}

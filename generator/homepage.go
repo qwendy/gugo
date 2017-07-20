@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 const (
@@ -46,7 +45,7 @@ func init() {
 	// Log as JSON instead of the default ASCII formatter.
 	// f := &log.TextFormatter{}
 	// f.QuoteEmptyFields = true
-	f := &prefixed.TextFormatter{}
+	f := &log.JSONFormatter{}
 	log.SetFormatter(f)
 
 	// Output to stdout instead of the default stderr
