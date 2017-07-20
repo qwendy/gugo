@@ -213,7 +213,7 @@
                 {{ range $key,$post := .Posts}}
                 <div class="ui segment">
                     {{range $_,$c := $post.Meta.Category}}
-                    <a class="ui teal right ribbon label">  
+                    <a class="ui teal right ribbon label" href="/category/{{$c}}">  
                         {{$c}} 
                     </a> {{end}}
 
@@ -221,7 +221,7 @@
 
                     <p>
                         {{range $_,$c := $post.Meta.Tags}}
-                        <a class="ui blue tag label">{{$c}}</a> {{end}}
+                        <a class="ui blue tag label" href="/tags/{{$c}}">{{$c}}</a> {{end}}
                     </p>
                     <div class="postContent">
                         {{ $post.TplData.Overview }}
