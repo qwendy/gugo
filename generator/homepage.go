@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"sort"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -79,6 +80,16 @@ func (hp *HomePage) GetPosts() error {
 	}
 	for i, file := range dir {
 		log.Infof("%v - Start parse %v", i, file.Name())
+		if file.IsDir() {
+			continue
+		}
+		name := strings.Split(file.Name(), ".")
+		if len(name) < 2 {
+			continue
+		}
+		// if name[len(name)-1] != "md" || name[len(name)-1] != "markdown" {
+		// 	continue
+		// }
 		p := NewPost(hp.SourceDir+"/"+file.Name(), hp.Destination, hp.PostTemplate)
 		if err := p.BatchHandle(); err != nil {
 			log.Errorf("Handle %v error:%v", file.Name(), err)

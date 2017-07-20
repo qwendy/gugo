@@ -14,6 +14,7 @@ type Tags struct {
 }
 
 type TagsTemplateData struct {
+	Kind  string
 	Infos map[string][]Post
 }
 
@@ -39,6 +40,7 @@ func (t *Tags) SetInfos() {
 // and index.html files of kinds of tags directories
 func (t *Tags) Generate() error {
 	data := TagsTemplateData{
+		Kind:  "tags",
 		Infos: t.Infos,
 	}
 	dir := t.Destination + "/tags"
@@ -55,9 +57,10 @@ func (t *Tags) Generate() error {
 		})
 		d := dir + "/" + name
 		if err := GenerateIndexFile(t.ListTemplate, struct {
+			Kind  string
 			Name  string
 			Infos []Post
-		}{Name: name, Infos: info}, d); err != nil {
+		}{Kind: "tags", Name: name, Infos: info}, d); err != nil {
 			return err
 		}
 	}

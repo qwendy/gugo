@@ -140,10 +140,10 @@
     <!-- Following Menu -->
     <div class="ui large top fixed hidden menu">
         <div class="ui container nav">
-            <a class="item" href="/">首页</a></a>
-            <a class="item">Category</a>
-            <a class="item" href="/tags">标签</a>
-            <a class="item">About</a>
+            <a class="item" href="/">Home</a></a>
+            <a class="item" href="/category">Category</a>
+            <a class="item" href="/tags">Tags</a>
+            <a class="item" href="/about">About</a>
             <div class="right item">
                 <div class="ui animated fade button" tabindex="0">
                     <div class="visible content">赋此间一抹丹砂</div>
@@ -155,10 +155,10 @@
 
     <!-- Sidebar Menu -->
     <div class="ui vertical inverted sidebar menu">
-        <a class="active item" href="/">首页</a>
-        <a class="item">归档</a>
+        <a class="item" href="/">首页</a>
+        <a class="item" href="/category">归档</a>
         <a class="item" href="/tags">标签</a>
-        <a class="item">关于</a>
+        <a class="item" href="/about">关于</a>
     </div>
 
 
@@ -175,10 +175,10 @@
                         <a class="ui inverted button" href="/">清 | 狂</a>
                     </div>
                     <div class="right item">
-                        <a class="active item" href="/">Home</a>
-                        <a class="item">分类</a>
-                        <a class="item" href="/tags">Tags</a>
-                        <a class="item">关于我</a>
+                        <a class="item" href="/">首页</a>
+                        <a class="item" href="/category">分类</a>
+                        <a class="item" href="/tags">标签</a>
+                        <a class="item" href="/about">关于我</a>
 
                     </div>
                 </div>
@@ -187,7 +187,7 @@
             <div class="ui text container">
                 <h1 class="ui inverted header">
                     <span class="han">
-                        {{.Name}}
+                       {{.Kind}}:{{.Name}}
                     </span>
                 </h1>
                 <h2 class="han">文章列表</h2>

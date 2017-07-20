@@ -154,10 +154,10 @@
     <!-- Following Menu -->
     <div class="ui large top fixed hidden menu">
         <div class="ui container nav">
-            <a href="/">首页</a></a>
-            <a class="item">Category</a>
-            <a class="active item" href="/tags">标签</a>
-            <a class="item">About</a>
+            <a href="/">Home</a></a>
+            <a class="item" href="/category">Category</a>
+            <a class="item" href="/tags">Tags</a>
+            <a class="item" href="/about">About</a>
             <div class="right item">
                 <div class="ui animated fade button" tabindex="0">
                     <div class="visible content">赋此间一抹丹砂</div>
@@ -170,8 +170,8 @@
     <!-- Sidebar Menu -->
     <div class="ui vertical inverted sidebar menu">
         <a class="item" href="/">首页</a>
-        <a class="item">归档</a>
-        <a class="active item" href="/tags">标签</a>
+        <a class="{{if eq .Kind "category"}} active {{end}}item" href="/category">分类</a>
+        <a class="{{if eq .Kind "tags"}} active {{end}}item" href="/tags">标签</a>
         <a class="item">关于</a>
     </div>
 
@@ -189,9 +189,9 @@
                         <a class="ui inverted teal button" href="/">清 | 狂</a>
                     </div>
                     <div class="right item">
-                        <a class="item" href="/">Home</a>
-                        <a class="item">分类</a>
-                        <a class="active item" href="/tags">Tags</a>
+                        <a class="item" href="/">首页</a>
+                               <a class="{{if eq .Kind "category"}} active {{end}}item" href="/category">分类</a>
+                               <a class="{{if eq .Kind "tags"}} active {{end}}item" href="/tags">标签</a>
                         <a class="item">关于我</a>
 
                     </div>
@@ -201,10 +201,9 @@
             <div class="ui text container">
                 <h1 class="ui inverted header">
                     <span class="han">
-                    标签列表
+                    {{.Kind}}列表
                     </span>
                 </h1>
-                <h2 class="han">清风江上游，一氧化二氢</h2>
             </div>
 
         </div>
@@ -213,7 +212,7 @@
         <div class="ui vertical stripe segment">
             <div class="ui text container">
                 {{range $name, $info := .Infos}}
-                <a class="ui blue tag label" href="/tags/{{$name}}">{{$name}}-{{$info|len}} </a> {{end}}
+                <a class="ui blue tag label" href="/{{$.Kind}}/{{$name}}">{{$name}}-{{$info|len}} </a> {{end}}
             </div>
         </div>
 
