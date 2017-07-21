@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/go-yaml/yaml"
 	"github.com/henrylee2cn/pholcus/common/goquery"
@@ -40,7 +39,6 @@ type Meta struct {
 	Date       string
 	Tags       []string
 	Category   []string
-	ParsedDate time.Time
 }
 
 func NewPost(sourcePath string, destination string, t *template.Template) *Post {

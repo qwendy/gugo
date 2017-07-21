@@ -1,48 +1,33 @@
 package generator
 
-import (
-	"os/exec"
-	"runtime"
-)
-
 type Static struct {
 	SourceDir      string
+	ThemeDir       string
 	DestinationDir string
 }
 
-func NewStatic(source, des string) *Static {
+func NewStatic(source, theme, des string) *Static {
 	return &Static{
+		ThemeDir:       theme,
 		SourceDir:      source,
 		DestinationDir: des,
 	}
 }
 
 func (s *Static) BatchHandle() (err error) {
-	switch runtime.GOOS {
-	case "windows":
-		cmd := exec.Command("rmdir.exe", "/s/q", s.DestinationDir)
-		err = cmd.Run()
-		if err != nil {
-			// cmd := exec.Command("rm", "-rf", s.DestinationDir)
-			// err = cmd.Run()
-			// if err != nil {
-			// 	return
-			// }
-			// cmd = exec.Command("cp", "-rf", s.SourceDir, s.DestinationDir)
-			// err = cmd.Run()
-			return
-		}
-		cmd = exec.Command("xcopy.exe", s.SourceDir, s.DestinationDir, "/s/e/y")
-		err = cmd.Run()
-	default:
-		cmd := exec.Command("rm", "-rf", s.DestinationDir)
-		err = cmd.Run()
-		if err != nil {
-			return
-		}
-		cmd = exec.Command("cp", "-rf", s.SourceDir, s.DestinationDir)
-		err = cmd.Run()
-		// err = fmt.Errorf("Have not write %v os copy-handler", runtime.GOOS)
+	err = s.CopyStaticDir()
+	if err != nil {
+		return
 	}
-	return
+	err = s.CopyPostImagesDir()
+	if err != nil {
+		return
+	}
+	return nil
+}
+func (s *Static) CopyStaticDir() error {
+	return CopyDir(s.ThemeDir+"/static", s.DestinationDir+"/static")
+}
+func (s *Static) CopyPostImagesDir() error {
+	return CopyDir(s.SourceDir+"/_images", s.DestinationDir+"/_images")
 }

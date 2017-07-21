@@ -1,20 +1,20 @@
 package main
 
 import (
+	"flag"
 	gugo "gugo/generator"
 	"html/template"
 	"log"
 	"net/http"
 )
 
-func main() {
-	indexTpl, _ := template.ParseFiles("./themes/微/index.html")
-	postTpl, _ := template.ParseFiles("./themes/微/post.html")
-	tagTpl, _ := template.ParseFiles("./themes/微/tag.html")
+func Generate(sourceDir, des, themeDir string) {
+	indexTpl, _ := template.ParseFiles(themeDir + "/index.html")
+	postTpl, _ := template.ParseFiles(themeDir + "/post.html")
+	tagTpl, _ := template.ParseFiles(themeDir + "/tag.html")
 	// categoryTpl, _ := template.ParseFiles("../themes/微/category.html")
-	listTpl, _ := template.ParseFiles("./themes/微/list.html")
-	des := "./public"
-	hp := gugo.NewHomePage("./source/_post", des, indexTpl, postTpl, 5, 5)
+	listTpl, _ := template.ParseFiles(themeDir + "/list.html")
+	hp := gugo.NewHomePage(sourceDir+"/_post", des, indexTpl, postTpl, 5, 5)
 	if err := hp.BatchHandle(); err != nil {
 		log.Println(err)
 		return
@@ -31,13 +31,38 @@ func main() {
 		log.Println(err)
 		return
 	}
+	s := gugo.NewStatic(sourceDir, themeDir, des)
+	if err := s.BatchHandle(); err != nil {
+		log.Println(err)
+		return
+	}
 }
 
-func StaticServer() {
-	// 前缀去除 ;列出dir
-	http.Handle("", http.StripPrefix("/public/", http.FileServer(http.Dir(""))))
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal(err)
+func main() {
+	methed := flag.String("m", "g", "run method. use g  to generate site. use s to run site by the local server")
+	des := flag.String("des", "./public", "destination directory")
+	source := flag.String("source", "./source", "source directory")
+	theme := flag.String("theme", "./themes/微", "theme directory")
+	port := flag.String("port", "9090", "local serfer`s port")
+
+	flag.Parse()
+	switch *methed {
+	case "g":
+		Generate(*source, *des, *theme)
+	case "s":
+		StaticServer(*des, *port)
+	default:
+		log.Println("Sorry! The Method Not Found!")
 	}
+
+}
+
+func StaticServer(des string, port string) {
+    // 设置静态目录
+    http.Handle("/", http.FileServer(http.Dir(des)))
+	log.Println("listen: http://127.0.0.1:"+port)
+	err := http.ListenAndServe(":"+port, nil)
+    if err != nil {
+        log.Fatal("ListenAndServe: ", err)
+    }
 }
