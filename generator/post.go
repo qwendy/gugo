@@ -35,10 +35,10 @@ type PostTemplateData struct {
 	Content  template.HTML
 }
 type Meta struct {
-	Title      string
-	Date       string
-	Tags       []string
-	Category   []string
+	Title    string
+	Date     string
+	Tags     []string
+	Category []string
 }
 
 func NewPost(sourcePath string, destination string, t *template.Template) *Post {
@@ -100,7 +100,7 @@ func (p *Post) ParseMetaData() (err error) {
 				metaStart = true
 			}
 		}
-		for _, s := range []string{"<!-- more -->", "<!-- more-->", "<!--more -->"} {
+		for _, s := range []string{"<!-- more -->", "<!-- more-->", "<!--more -->", "<!--more-->"} {
 			if strings.Contains(string(line), s) {
 				overviewFinished = true
 			}
